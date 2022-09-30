@@ -1534,6 +1534,55 @@ def mytransform_svg(text):
 
 ###################
 
+def mytransform_reprints(text):
+
+    thetext = text
+
+    thetext = re.sub("\n{2,}", "\n\n", thetext)
+    theentries = thetext.split('\n\n')
+    theanswer = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\(", "\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>Recent AIM reprints</h1>'
+
+    for ct, entry in enumerate(theentries):
+        theselines = entry.splitlines()
+        if len(theselines) == 0: continue
+        formatted_entry = ""
+        print("XXXX",theselines,"XXXX")
+        if len(theselines[0])==4:
+            print("found a year", theselines[0])
+            formatted_entry = "<div class='newyear'>"
+            formatted_entry += theselines[0]
+            formatted_entry += "</div>"
+        else:
+            if ct < 20:
+                print(entry)
+            these_authors = theselines[0].strip()
+            authors_nameorder = ""
+            authorlist = these_authors.split(";")
+            for author in authorlist:
+                print("author", author, "from", authorlist, "from", these_authors)
+                lastname, firstname = author.split(",")
+                authors_nameorder += firstname.strip() + " "
+                authors_nameorder += lastname.strip() + ", "
+            authors_nameorder = authors_nameorder[:-2]  # " the last ", "
+            this_title = theselines[1].strip()
+            this_pub = theselines[2].strip()
+            this_arXiv = theselines[3].strip()
+            formatted_title = "<a class='papertitle' href='https://arxiv.org/abs/" + this_arXiv + "'>" + this_title + "</a>\n"
+            formatted_authors = "<div class='paperauthors'>" + authors_nameorder + "</div>\n"
+
+            formatted_entry = "\n<div class='onepaper'>\n"
+            formatted_entry += formatted_title
+            formatted_entry += formatted_authors
+            formatted_entry += "<div class='pub'>"+this_pub+"</div>"
+            formatted_entry += "</div>"
+
+        theanswer += formatted_entry + "\n"
+
+    theanswer += "</body> </html>"
+    return theanswer
+
+###################
+
 def mytransform_txt(text):
 
     thetext = text

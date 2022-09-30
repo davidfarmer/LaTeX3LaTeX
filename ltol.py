@@ -27,6 +27,7 @@ conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mb
                       "ptx",
                       "fixptx",
                       "ldata",
+                      "reprints",
                       "html_ptx",
                       "html_pp",
                       "alice", "lmfdb",
@@ -127,6 +128,9 @@ elif component.filetype_plus in ["svg"]:
 elif component.filetype_plus in ["ldata"]:
     fileextension_in = ""
     fileextension_out = ""
+elif component.filetype_plus in ["reprints"]:
+    fileextension_in = "txt"
+    fileextension_out = "html"
 elif component.filetype_plus in ["iso"]:
     fileextension_in = "iso"
     fileextension_out = "html"
@@ -137,6 +141,16 @@ else:
     fileextension_in = component.filetype_plus
     fileextension_out = component.filetype_plus
 
+print("here", component.filetype_plus)
+print("here 1", os.path.isfile(component.inputname))
+print("here 1", component.inputname)
+print("here 2", os.path.isdir(component.outputname))
+print("here 2b", component.outputname)
+print("here 2a", os.path.isdir("/Users/farmer/AIM/AlexandersonAward/ReprintList/xxxx"))
+print("here 3b", not dorecursive)
+print("here 3a", dorecursive)
+print("here 3c", not dorecursive)
+print("here 4", os.path.isdir(component.inputname) and os.path.isdir(component.outputname) and (not dorecursive))
 if os.path.isfile(component.inputname) and not os.path.isdir(component.outputname):
     component.iofilepairs.append([component.inputname,component.outputname])
     print("converting one file:",component.inputname)
@@ -294,6 +308,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_svg(component.onefile)
     elif component.filetype_plus in ['ldata']:
         component.onefile = myoperations.mytransform_ldata(component.onefile)
+    elif component.filetype_plus in ['reprints']:
+        component.onefile = myoperations.mytransform_reprints(component.onefile)
     elif component.filetype_plus in ['iso']:
         component.onefile = myoperations.mytransform_iso(component.onefile)
     elif component.filetype_plus in ['mbx', 'xml']:
