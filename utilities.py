@@ -9,6 +9,234 @@ import component
 
 #################
 
+def tex_to_html_alphabets(text):
+
+    # we need to develop these as a list of pairs, which then generate
+    # substitutions that go either way.
+
+    thetext = text
+
+    # for people who write \'{e} instead of \'e
+    thetext = re.sub(r"\\('|`|\^|~)\{([a-zA-Z])\}",r"\\\1\2",thetext)
+    thetext = re.sub(r'\\"\{([a-zA-Z])\}',r'\\"\1',thetext)
+
+    for tex, html in tex_to_html_characters:
+        thetext = re.sub(tex, html, thetext)
+
+    thetext = re.sub(r"\\S ",'&#xa7;',thetext)
+    thetext = re.sub(r"\\S\b",'&#xa7;',thetext)
+    thetext = re.sub(r"\\S([0-9])",r'&#xa7;\1',thetext)
+
+    thetext = re.sub(r"([^-])---([^-])",r"\1&#8202;&#x2014;&#8202;\2",thetext)  #emdash
+    thetext = re.sub(r"--",'&#x2013;',thetext)  #endash
+
+    thetext = re.sub(r"(\W){([A-Z])}",r'\1\2',thetext)   # {R}iemann --> Riemann
+    thetext = re.sub(r"(Mc|Mac){([A-Z])}",r'\1\2',thetext)   # Mc{K}ay --> McKay
+    thetext = re.sub(r"{(&[a-z]+;)}",r'\1',thetext)   # fr{&eacute;}re --> fr&eacute;re
+    thetext = re.sub(r"{(&#[0-9a-z]+;)}",r'\1',thetext)   # Ho{&#351;}ten --< Ho&#351;ten
+
+    thetext = re.sub(r"\\LaTeX\b",'<span class="latex">L<sup>A</sup>T<sub>E</sub>X</span>',thetext)
+    thetext = re.sub(r"\\MathML\b",'<span class="latex">MathML</span>',thetext)
+    thetext = re.sub(r"\\,",' ',thetext)   # check that this is only applied in the correct places
+
+    thetext = re.sub(r"\\sp\b", "^", thetext)
+    thetext = re.sub(r"\\sb\b", "_", thetext)
+
+    return thetext
+
+###################
+
+tex_to_html_characters = [
+    [r"\\~n",r"&#xf1;"],
+    [r"\\`o",r"&#xf2;"],
+    [r"\\'o",r"&#xf3;"],
+    [r"\\\^o",r"&#xf4;"],
+    [r"\\\^\s*{\\i}",r"&#xee;"],
+    [r"\\\^\\i",r"&#xee;"],
+    [r"\\\^{\\i}",r"&#xee;"],
+    [r"\\\^i",r"&#xee;"],
+    [r"\\\^e",r"&#xea;"],
+    [r"\\\^a",r"&#xe2;"],
+    [r"\\~o",r"&#xf5;"],
+    [r'\\"o',r"&#xf6;"],   # &#xf7; is the "divides" symbol
+    [r'\\o\s',r"&#xf8;"],
+    [r'{\\o}',r"&#xf8;"],
+    [r'\\o\b',r"&#xf8;"],
+    [r'\\`u',r"&#xf9;"],
+    [r"\\'u",r"&#xfa;"],
+    [r"\\\^u",r"&#xfb;"],
+    [r'\\"u',r"&#xfc;"],
+    [r"\\'y",r"&#xfd;"],
+    [r"\\\.x",r"&#x017C;"],
+    [r"\\`a",r"&#xe0;"],
+    [r"\\`A",r"&#xc0;"],
+    [r"\\'a",r"&#xe1;"],
+    [r"\\'A",r"&#xc1;"],
+    [r'\\"a',r"&#xe4;"],
+    [r'\\"A',r"&#xc4;"],
+    [r"\\`e",r"&#xe8;"],
+    [r"\\'e",r"&#xe9;"],
+    [r"\\'E",r"&#xc9;"],
+    [r'\\"e',r"&#xeb;"],
+    [r'\\"E',r"&#xcb;"],
+    [r"\\'{\\i}",r"&#xed;"],
+    [r"\\'\\i(\b|\s)",r"&#xed;"],
+    [r"\\'{i}",r"&#xed;"],
+    [r"\\'i",r"&#xed;"],  # not proper TeX, but people do it
+    [r'\\"\s*{\\i}',r"&#xef;"],   # also &iuml;
+    [r'{\\"\\i}',r"&#xef;"],
+    [r'\\"\\i(\b|\s)',r"&#xef;"],
+    [r'\\"i',r"&#xef;"],   # not proper TeX, but people do it
+    [r"\\c c",r"&#xe7;"],
+    [r"\\c C",r"&#xc7;"],
+    [r"\\c\{c\}",r"&#xe7;"],
+    [r"\\c\{C\}",r"&#xc7;"],
+    [r"\\c e",r"&#281;"],
+    [r"\\c\{e\}",r"&#281;"],
+    [r"\\c S",r"&#350;"],
+    [r"\\c\{S\}",r"&#350;"],
+    [r"\\c s",r"&#351;"],
+    [r"\\c\{s\}",r"&#351;"],
+    [r"\\c t",r"&#355;"],
+    [r"\\c\{t\}",r"&#355;"],
+    [r"\\c ([a-zA-Z])",r"\1&#807;"],   # necessary for \c{a}, which is 2 characters in html
+    [r"\\c\{([a-zA-Z])\}",r"\1&#807;"],
+    [r'\\"([A-Za-z])',r"&\1uml;"],
+    [r'\\"([A-Za-z])',r"&\1uml;"],
+    [r'\\" ([A-Za-z])',r"&\1uml;"],
+    [r'\\"\{([A-Za-z])\}',r"&\1uml;"],
+    [r"\\'O",r"&#211;"],
+    [r"\\'o",r"&#243;"],
+    [r"\\'([A-Za-z])",r"&\1acute;"],
+    [r"\\' ([A-Za-z])",r"&\1acute;"],
+    [r"\\'{([A-Za-z])}",r"&\1acute;"],
+    [r"\\`\\i(\b|\s)",r"&igrave;"],
+    [r"\\`{\\i}",r"&igrave;"],
+    [r"\\`([A-Za-z])",r"&\1grave;"],
+    [r"\\` ([A-Za-z])",r"&\1grave;"],
+    [r"\\`{([A-Za-z])}",r"&\1grave;"],
+#    [r"\\\^([A-Za-z])",r"&\1circ;"],
+    [r"\\\^\s*([A-Za-z])",r"&\1circ;"],  # do the \s* instead of 2 lines for other cases?
+    [r"\\\^{([A-Za-z])}",r"&\1circ;"],
+    [r"\\\^{\\i}",r"&icirc;"],
+    [r"\\r a",r"&#229;"],
+    [r"\\r\{a\}",r"&#229;"],
+    [r"\\r A",r"&#197;"],
+    [r"\\r\{A\}",r"&#197;"],
+    [r"\{\\aa\}",r"&#229;"],
+    [r"\\aa ",r"&aring;"],
+    [r"\{\\AA\}",r"&#197;"],
+    [r"\\AA ",r"&#197;"],
+    [r"\{\\o\}",r"&#248;"],  # &oslash;
+    [r"\{\\O\}",r"&#216;"],  # &Oslash;
+    [r"\\o ",r"&#248;"],
+    [r"\\O ",r"&#216;"],
+
+    [r"\\H\{o\}",r"&#337;"],
+    [r"\\H o",r"&#337;"],
+
+    [r"\\u A",r"&#258;"],
+    [r"\\u\{A\}",r"&#258;"],
+    [r"\\u a",r"&#259;"],
+    [r"\\u\{a\}",r"&#259;"],
+    [r"\\u E",r"&#276;"],
+    [r"\\u\{E\}",r"&#276;"],
+    [r"\\u e",r"&#277;"],
+    [r"\\u\{e\}",r"&#277;"],
+    [r"\\u I",r"&#300;"],
+    [r"\\u\{I\}",r"&#300;"],
+    [r"{\\u\s*\\i\s*}",r"&#301;"],
+    [r"\\u\s*\\i(\b|\s)",r"&#301;"],
+    [r"\\u\{\\i\s*\}",r"&#301;"],
+    [r"\\u O",r"&#334;"],
+    [r"\\u\{O\}",r"&#334;"],
+    [r"\\u o",r"&#335;"],
+    [r"\\u\{o\}",r"&#335;"],
+    [r"\\u U",r"&#364;"],
+    [r"\\u\{U\}",r"&#364;"],
+    [r"\\u u",r"&#365;"],
+    [r"\\u\{u\}",r"&#365;"],
+    [r"\\u G",r"&#286;"],
+    [r"\\u\{G\}",r"&#286;"],
+    [r"\\u g",r"&#287;"],
+    [r"\\u\{g\}",r"&#287;"],
+    [r"\\u Z",r"&#142;"],
+    [r"\\u\{Z\}",r"&#142;"],
+
+    # other uses of \u, such as \u{C}, may be errors for \v
+#    [r"\\u\b",r"\\v"],
+
+    [r"\\(v|u){a}",r"&#462;"],     # &acaron; is not defined
+    [r"\\(v|u) a",r"&#462;"],      # and should use the hex version for consistency
+    [r"\\(v|u){e}",r"&#x11b;"],
+    [r"\\(v|u) e",r"&#x11b;"],
+    [r"\\(v|u){g}",r"&#287;"],  # this is \u g , because we assume the author made an error
+    [r"\\(v|u) g",r"&#287;"],   #   " same "
+    [r"\\(v|u){([A-Za-z])}",r"&\2caron;"],
+    [r"\\(v|u) ([A-Za-z])",r"&\2caron;"],
+
+    [r"\{\\=g\}",r"&#x1E21;"],
+    [r"\\=g",r"&#x1E21;"],
+    [r"\\= g",r"&#x1E21;"],
+    [r"\\=\{g\}",r"&#x1E21;"],
+
+    [r"\{\\=I\}",r"&#298;"],
+    [r"\\=I",r"&#298;"],
+    [r"\\= I",r"&#298;"],
+    [r"\\=\{I\}",r"&#298;"],
+    [r"\{\\=i\}",r"&#299;"],
+    [r"\\=i",r"&#299;"],
+    [r"\\= i",r"&#299;"],
+    [r"\\=\{i\}",r"&#299;"],
+    [r"\{\\=\\i\s*\}",r"&#299;"],
+    [r"\\=\\i\s?",r"&#299;"],
+    [r"\\= \\i\s?",r"&#299;"],
+    [r"\\=\{\\i\s*\}",r"&#299;"],
+
+
+    [r"\{\\=u\}",r"&#363;"],
+    [r"\\=u",r"&#363;"],
+    [r"\\= u",r"&#363;"],
+    [r"\\=\{u\}",r"&#363;"],
+
+    [r"\\~u",r"&#x169;"],
+    [r"\\~\{u\}",r"&#x169;"],
+    [r'\\~([A-Za-z])',r"&\1tilde;"],
+    [r'\\~\{([A-Za-z])\}',r"&\1tilde;"],
+
+    [r"{\\DJ}",'&#272;'],
+    [r"\\DJ ",'&#272;'],
+    [r"\\DJ\b",'&#272;'],
+    [r"{\\dj}",'&#273;'],
+    [r"\\dj ",'&#273;'],
+    [r"\\dj\b",'&#273;'],
+    [r"{\\Dbar}",'&#272;'],
+    [r"\\Dbar ",'&#272;'],
+    [r"\\Dbar\b",'&#272;'],
+
+    [r"{\\ss}",'&#223;'],
+    [r"\\ss ",'&#223;'],
+    [r"\\ss\b",'&#223;'],
+
+    [r"\{\\cprime *\}",r"'"],
+    [r"\\cprime ",r"'"],
+
+    [r"\\textquotedblleft\s*",r'"'],
+    [r"\\textquotedblright",r'"'],
+
+    [r"{\\i}",'&#305;'],
+    [r"\\i(\b|\s)",'&#305;'],
+    [r"{\\l}",'&#322;'],
+    [r"\\l ",'&#322;'],
+    [r"\\l\b",'&#322;'],
+    [r"{\\L}",'&#321;'],
+    [r"\\L ",'&#321;'],
+    [r"\\L\b",'&#321;'],
+    [r"{\\(oe|OE|ae|AE)}",r'&\1lig;'],
+    [r"\\(oe|OE|ae|AE) ",r'&\1lig;'],
+    [r"\\(oe|OE|ae|AE)\b",r'&\1lig;']
+    ]
+
 def sha1hexdigest(text):
     """Return the sha1 hash of text, in hexadecimal."""
 
