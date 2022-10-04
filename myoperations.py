@@ -1538,30 +1538,33 @@ def mytransform_reprints(text):
 
     thetext = text
 
+    byyear = {str(n) : "" for n in range(1998,2025) }
+
     thetext = re.sub("\n{2,}", "\n\n", thetext)
     thetext = re.sub("\?\?\?", "-", thetext)
     theentries = thetext.split('\n\n')
-    theanswer = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>Recent AIM reprints</h1>'
+    theanswer = ""
+    thehead = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>AIM reprints</h1>'
 
     for ct, entry in enumerate(theentries):
         theselines = entry.splitlines()
         if len(theselines) == 0: continue
         formatted_entry = ""
-        print("XXXX",theselines,"XXXX")
+#        print("XXXX",theselines,"XXXX")
         if len(theselines[0])==4:
             print("found a year", theselines[0])
             formatted_entry = "<div class='newyear'>"
             formatted_entry += theselines[0]
             formatted_entry += "</div>"
         else:
-            if ct < 20:
-                print(entry)
+   #         if ct < 20:
+   #             print(entry)
             these_authors = theselines[0].strip()
             these_authors = re.sub("^\* *", "", these_authors)
             authors_nameorder = ""
             authorlist = these_authors.split(";")
             for author in authorlist:
-                print("author", author, "from", authorlist, "from", these_authors)
+   #             print("author", author, "from", authorlist, "from", these_authors)
                 if author.count(",") == 1:
                     lastname, firstname = author.split(",")
                     authors_nameorder += firstname.strip() + " "
@@ -1587,10 +1590,35 @@ def mytransform_reprints(text):
             formatted_entry += "<div class='pub'>"+this_pub+"</div>"
             formatted_entry += "</div>"
 
+            if re.search("\((19|20)[0-9]{2}\)", this_pub):
+                this_year = re.sub(r".*\(((19|20)[0-9]{2})\).*", r"\1", this_pub,1,re.DOTALL)
+                byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
+
+            elif re.search("(19|20)[0-9]{2}", this_pub):
+                this_year = re.sub(r".*(199[0-9]|20[0-2][0-9]).*", r"\1", this_pub,1,re.DOTALL)
+                if len(this_year) != 4:  print("ERROR", this_pub)
+                try:
+                    byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
+                except:
+                    print("year", this_year, " ERROR", this_pub)
+
+            else:
+                print(    "no year", entry)
+    #            print(    "everything",entry)
+
         theanswer += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
 
+    theanswer = thehead + theanswer
     theanswer += "</body> </html>"
-    return theanswer
+
+    answer_by_year = thehead
+
+    for n in range(2022, 1997, -1):
+        answer_by_year += "<div class='newyear'>" + str(n) + "</div>"
+        answer_by_year += byyear[str(n)]
+        
+    return answer_by_year
+ #   return theanswer
 
 ###################
 
