@@ -1538,6 +1538,8 @@ def mytransform_reprints(text):
 
     thetext = text
 
+    thetitles = []
+
     byyear = {str(n) : "" for n in range(1998,2025) }
 
     thetext = re.sub("\n{2,}", "\n\n", thetext)
@@ -1545,6 +1547,10 @@ def mytransform_reprints(text):
     theentries = thetext.split('\n\n')
     theanswer = ""
     thehead = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>AIM reprints</h1>'
+
+    thehead = "<style>.subpage > * { margin-left: auto; margin-right: auto; padding-left: 50px; padding-right: 60px; max-width: 600px; } .subpage { margin-bottom: 50px; } .newyear { margin-top: 2ex; margin-bottom: 0.5ex; font-size: 200%; } .onepaper { margin-bottom: 1.5ex; } .papertitle { text-decoration: none; font-size: 110%; } .papertitle:hover { background: #eee; } .pub { margin-left: 2em; font-style: italic; }</style>"
+
+    thehead += "<dvi class='subpage'>"
 
     for ct, entry in enumerate(theentries):
         theselines = entry.splitlines()
@@ -1573,7 +1579,16 @@ def mytransform_reprints(text):
                      authors_nameorder += author + ", "
             authors_nameorder = authors_nameorder[:-2]  # " the last ", "
             this_title = theselines[1].strip()
+            this_title = re.sub(r"\$", r"\\(", this_title,1)
+            this_title = re.sub(r"\$", r"\\)", this_title,1)
+            this_title = re.sub(r"\$", r"\\(", this_title,1)
+            this_title = re.sub(r"\$", r"\\)", this_title,1)
+            this_title = re.sub(r"\$", r"\\(", this_title,1)
+            this_title = re.sub(r"\$", r"\\)", this_title,1)
+            thetitles.append(this_title)
             this_pub = theselines[2].strip()
+            this_pub = re.sub(r"\$", r"\\(", this_pub,1)
+            this_pub = re.sub(r"\$", r"\\)", this_pub,1)
             this_arXiv = theselines[3].strip()
             this_arXiv = this_arXiv[6:].strip()
             if this_arXiv.startswith(("n", "N")):
@@ -1609,15 +1624,20 @@ def mytransform_reprints(text):
         theanswer += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
 
     theanswer = thehead + theanswer
-    theanswer += "</body> </html>"
+#    theanswer += "</body> </html>"
+    theanswer += "</div>"
 
     answer_by_year = thehead
 
     for n in range(2022, 1997, -1):
         answer_by_year += "<div class='newyear'>" + str(n) + "</div>"
         answer_by_year += byyear[str(n)]
-        
-    return answer_by_year
+
+    thetitles.sort()
+#    for title in thetitles:  print(title)
+    print(len(thetitles), "total")
+
+    return answer_by_year + "</div>"
  #   return theanswer
 
 ###################
