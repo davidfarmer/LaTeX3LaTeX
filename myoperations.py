@@ -1194,6 +1194,60 @@ def mytransform_ht(txt):
     return ""
 ###################
 
+def mytransform_ptx_transform(text):
+
+    thetext = text
+
+    thetext = re.sub(r" *<p>\s*\\setboolean{[^{}]+}\s*{[^{}]+}\s*</p>\s*", "", thetext)
+
+#    thetext = re.sub("(<idx><h>)([^<>]+)(</h></idx>)", r"\1" + "ggg" + r"\2".lower() + r"\3", thetext)
+
+    thetext = re.sub("(<idx><h>[^<>]+</h></idx>)", lambda m: m.group(0).lower(), thetext)
+
+    thetext = re.sub(r"`\\=A", "&#699;&#256;", thetext)
+    thetext = re.sub(r"`\\={A}", "&#699;&#256;", thetext)
+    thetext = re.sub(r"o`o", "o&#699;o", thetext)
+    thetext = re.sub(r"\\={a}", "&#257;", thetext)
+    thetext = re.sub(r"`a", "&#699;a", thetext)
+
+    thetext = re.sub(r"<p>\s*\\Question\s*(.*?)\s*</p>",
+            lambda match: mytransform_ptx_trans(match), thetext, 0, re.DOTALL)
+
+    return thetext
+
+def mytransform_ptx_trans(txt):
+
+    thetext = txt.group(1)
+
+    thetext.strip()
+
+    theintro = ""
+    if not thetext.startswith("\\begin{tasks"):
+        theintro = re.sub(r"^(.*)(\\begin{tasks.*)", r"\1", thetext, 1, re.DOTALL)
+        thetasks = re.sub(r"^(.*)(\\begin{tasks.*)", r"\2", thetext, 1, re.DOTALL)
+    else:
+        thetasks = thetext
+
+    thetasks = re.sub(r"\\(begin|end){tasks}\([0-9]\)", "", thetasks)
+    thetasks = re.sub(r"\\(begin|end){tasks}", "", thetasks)
+    thetasks = thetasks.strip()
+    if not thetasks.startswith("\\task"):
+        print("bad formatting", thetasks)
+
+    thetasks = re.sub(r"^\\task", "  <task>\n    <statement>\n      <p>\n        ", thetasks)
+    thetasks = re.sub(r"\\task", "\n      </p>\n    </statement>\n    <answer>\n    <p>\n      MYANSWER\n    </p>\n    </answer>\n  </task>\n  <task>\n    <statement>\n      <p>\n        ", thetasks)
+    thetasks += "\n      </p>\n    </statement>\n    <answer>\n      <p>\n        MYANSWER\n      </p>\n    </answer>\n  </task>"
+
+
+    theresult = ""
+    if theintro:
+        theresult += "\n<introduction>\n  <p>\n    " + theintro + "\n  </p>\n</introduction>\n"
+    theresult +=  thetasks
+
+    return theresult
+
+###################
+
 def mytransform_svg(text):
 
     thetext = text

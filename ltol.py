@@ -20,7 +20,7 @@ import myoperations
 # input and output files.
 #################################
 
-conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mbx_strict_tex", "mbx_strict_html", "mbx_fa",
+conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mbx_strict_tex", "mbx_strict_html", "mbx_fa", "ptx_transform",
                       "txt",
                       "svg",
                       "iso",
@@ -128,6 +128,9 @@ elif component.filetype_plus in ["svg"]:
 elif component.filetype_plus in ["ldata"]:
     fileextension_in = ""
     fileextension_out = ""
+elif component.filetype_plus in ["ptx_transform"]:
+    fileextension_in = "ptx"
+    fileextension_out = "ptx"
 elif component.filetype_plus in ["reprints"]:
     fileextension_in = "txt"
     fileextension_out = "html"
@@ -304,6 +307,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = transforms.lmfdb(component.onefile)
     elif component.filetype_plus in ['ptx']:
         component.onefile = myoperations.mytransform_ptx(component.onefile)
+    elif component.filetype_plus in ['ptx_transform']:
+        component.onefile = myoperations.mytransform_ptx_transform(component.onefile)
     elif component.filetype_plus in ['svg']:
         component.onefile = myoperations.mytransform_svg(component.onefile)
     elif component.filetype_plus in ['ldata']:
