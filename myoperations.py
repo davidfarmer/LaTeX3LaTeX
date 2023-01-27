@@ -371,40 +371,61 @@ def mytransform_ldata(text):
   
 #########3
 
-
-def mytransform_mbx(text):   # schmidt calc 3 temporary
+def mytransform_probhtml(text):   # schmidt calc 3 temporary
 #def mbx_fix(text):   # schmidt calc 3 temporary
 
 
     thetext = text
 
-    thetext = re.sub(r"</c>([a-z])", r"</c> \1", thetext)
+    thetext = re.sub(r"<!DOCTYPE html>\w*", r"", thetext)
 
-#    thetext = re.sub(r"\\G\b", r"\\mathcal{G}", thetext)
-#    thetext = re.sub(r"\\fatr\b", r"\\R", thetext)
-#    thetext = re.sub(r"\\fatz\b", r"\\Z", thetext)
-#    thetext = re.sub(r"\\fatq\b", r"\\Q", thetext)
-#    thetext = re.sub(r"\\fatc\b", r"\\C", thetext)
-#    thetext = re.sub(r"\\fatn\b", r"\\N", thetext)
+    thebody = re.sub(r".*<body>(.*)</body>.*", r"\1", thetext, 1, re.DOTALL)
 
-#    thetext = re.sub(r"EXTRA\s*<fn>(.*?)</fn>\s*", r"\\extrafn{\1}", thetext, 0, re.DOTALL)
-#
-#    for mac in ["bmw", "valpo", "valposhort","marginparbmw"]:
-#         thetext = utilities.replacemacro(thetext,mac,1,"\n<insight><p>\n#1\n</p></insight>\n")
-#
-##    for mac in ["extrafn", "instructor"]:
-#    for mac in ["note"]:
-#        thetext = utilities.replacemacro(thetext, mac,1,"<!-- \XX" + mac + "{#1} -->")
-#        thetext = re.sub("XX" + mac, mac, thetext)
-#
-#    thetext = re.sub(r"<p>\s*\\section{([^}]+)}",r"\\section{\1}<p>",thetext)
-#    thetext = utilities.replacemacro(thetext,"section",1,"<title>#1</title>\n")
-#
-#    thetext = utilities.replacemacro(thetext,"item",0,"</p></li>\n<li><p>\n")
-#    thetext = re.sub(r"\\begin{itemize}\s*</p>\s*</li>","<ul>",thetext)
-#    thetext = re.sub(r"\\end{itemize}","</p></li></ul>",thetext)
-    
+    if "section-title" in thebody:
+        theanswer =  mytransform_probhtmlsection(thebody)
+
+    else:
+        theanswer =  mytransform_probhtmlmain(thebody)
+
+    return theanswer
+
+#--------------------------------#
+
+def mytransform_probhtmlsection(text):
+
+    thetext = text
+
+    thetext = re.sub(r'<div id="breadc.*?</div>', "", thetext, 1, re.DOTALL)
+
+    # remove leading which space on each line
+    thetext = re.sub(r"^ +", "", thetext, 0, re.M)
+    # remove blank lines
+    thetext = re.sub("\n+", "\n", thetext)
+    # remove comments
+    thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
+    # remove comments
+    thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
+    # remove some html formatting
+    thetext = re.sub('<div class="clear.*?</div>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub('<div style="clear.*?</div>', "", thetext, 0, re.DOTALL)
+
+    # remove functionality markup
+    thetext = re.sub('<a class="edit.*?</a>', "", thetext, 0, re.DOTALL)
+    # maybe keep this one, but check if it is nonempty to flag changes that
+    # need to be incorporated before converting
+    thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
+
     return thetext
+
+#--------------------------------#
+
+def mytransform_probhtmlmain(text):
+
+    thetext = text
+
+    return thetext
+
+#####################################
 
 def mytransform_mbx_remove_linefeeds(text):
 

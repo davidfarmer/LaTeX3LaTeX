@@ -23,6 +23,7 @@ import myoperations
 conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mbx_strict_tex", "mbx_strict_html", "mbx_fa", "ptx_transform",
                       "txt",
                       "raw",
+                      "probhtml",
                       "svg",
                       "iso",
                       "ptx",
@@ -104,6 +105,9 @@ elif component.filetype_plus in ["html_pp"]:
     fileextension_out = "html"
 elif component.filetype_plus in ["alice"]:
     fileextension_in = "txt"
+    fileextension_out = "ptx"
+elif component.filetype_plus in ["probhtml"]:
+    fileextension_in = "html"
     fileextension_out = "ptx"
 elif component.filetype_plus in ["raw"]:
     fileextension_in = "raw"
@@ -309,6 +313,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = transforms.html_pp(component.onefile)
     elif component.filetype_plus == 'alice':
         component.onefile = transforms.alice(component.onefile)
+    elif component.filetype_plus == 'probhtml':
+        component.onefile = myoperations.mytransform_probhtml(component.onefile)
     elif component.filetype_plus == 'lmfdb':
         component.onefile = transforms.lmfdb(component.onefile)
     elif component.filetype_plus in ['ptx']:
