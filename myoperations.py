@@ -1696,6 +1696,28 @@ def mytransform_reprints(text):
 
 ###################
 
+def mytransform_raw(text):
+    
+    thetext = text      
+
+    thetext = re.sub("&#39;", '"', thetext)
+
+    theexamples = re.findall('<code>(.*?)</code>', thetext, re.DOTALL)
+
+    theanswer = "lmfdbgl3data = {"
+
+    for example in theexamples:
+        example = re.sub("<a href.*</a>", "", example)
+        if example.strip():
+          theanswer += example
+          theanswer += "," + "\n"
+
+    theanswer = theanswer[:-2] + "\n" + "}"
+
+    return theanswer
+
+###################
+
 def mytransform_txt(text):
 
     thetext = text

@@ -22,6 +22,7 @@ import myoperations
 
 conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mbx_strict_tex", "mbx_strict_html", "mbx_fa", "ptx_transform",
                       "txt",
+                      "raw",
                       "svg",
                       "iso",
                       "ptx",
@@ -104,6 +105,9 @@ elif component.filetype_plus in ["html_pp"]:
 elif component.filetype_plus in ["alice"]:
     fileextension_in = "txt"
     fileextension_out = "ptx"
+elif component.filetype_plus in ["raw"]:
+    fileextension_in = "raw"
+    fileextension_out = "txt"
 elif component.filetype_plus in ["lmfdb"]:
     fileextension_in = "txt"
     fileextension_out = "txt"
@@ -297,6 +301,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_to_semantic(component.onefile)
     elif component.filetype_plus == 'txt':
         component.onefile = myoperations.mytransform_txt(component.onefile)
+    elif component.filetype_plus == 'raw':
+        component.onefile = myoperations.mytransform_raw(component.onefile)
     elif component.filetype_plus == 'html':
         component.onefile = myoperations.mytransform_html(component.onefile)
     elif component.filetype_plus == 'html_pp':
