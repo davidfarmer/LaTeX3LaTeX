@@ -393,16 +393,18 @@ def mytransform_probhtml(text):   # schmidt calc 3 temporary
 
 def mytransform_probhtmlsection(text):
 
+    print("in mytransform_probhtmlsection")
     thetext = text
 
     thetext = re.sub(r'<div id="breadc.*?</div>', "", thetext, 1, re.DOTALL)
+
+    # remove script tags
+    thetext = re.sub(r'<script>.*?</script>', "", thetext, 0, re.DOTALL)
 
     # remove leading which space on each line
     thetext = re.sub(r"^ +", "", thetext, 0, re.M)
     # remove blank lines
     thetext = re.sub("\n+", "\n", thetext)
-    # remove comments
-    thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
     # remove comments
     thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
     # remove some html formatting
@@ -414,6 +416,22 @@ def mytransform_probhtmlsection(text):
     # maybe keep this one, but check if it is nonempty to flag changes that
     # need to be incorporated before converting
     thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
+
+    # remove TOC
+    thetext = re.sub('<div class="nav-inner">.*?<ul>.*?</ul>', "", thetext, 0, re.DOTALL)
+
+    # find the title
+    sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetext,1, re.DOTALL)
+    sectiontitle = re.sub("^\S+\s+", "", sectiontitle)
+    print("found the sewction title", sectiontitle);
+
+    theproblems = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)
+    print("number of theproblems", len(theproblems))
+    for prob in theproblems:
+        print(prob)
+        print("-------------")
+
+    print("number of li", thetext.count("<li "))
 
     return thetext
 
