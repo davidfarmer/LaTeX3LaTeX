@@ -408,26 +408,40 @@ def mytransform_probhtmlsection(text):
     # remove comments
     thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
     # remove some html formatting
-    thetext = re.sub('<div class="clear.*?</div>', "", thetext, 0, re.DOTALL)
-    thetext = re.sub('<div style="clear.*?</div>', "", thetext, 0, re.DOTALL)
+#    thetext = re.sub('<div class="clear.*?</div>', "", thetext, 0, re.DOTALL)
+#    thetext = re.sub('<div style="clear.*?</div>', "", thetext, 0, re.DOTALL)
 
     # remove functionality markup
     thetext = re.sub('<a class="edit.*?</a>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub('<span class="edit.*?</span>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub('<ul class="pending-additions"></ul>', "", thetext)
+    thetext = re.sub('<ul class="pending-changes"></ul>', "", thetext)
     # maybe keep this one, but check if it is nonempty to flag changes that
     # need to be incorporated before converting
-    thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
+#    thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
 
     # remove TOC
     thetext = re.sub('<div class="nav-inner">.*?<ul>.*?</ul>', "", thetext, 0, re.DOTALL)
 
     # find the title
+    
     sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetext,1, re.DOTALL)
     sectiontitle = re.sub("^\S+\s+", "", sectiontitle)
+    # delete the div.render containing the page title
+    thetext = re.sub(r'<div class="render">.*?</div>', r"", thetext,1, re.DOTALL)
     print("found the sewction title", sectiontitle);
 
-    theproblems = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)
-    print("number of theproblems", len(theproblems))
+    # we think this finds the complete problems
+
+    theproblems = re.findall(r'<div class="render">(.*?)<div style="clear: right"></div>\s*</div>', thetext, re.DOTALL)
+
+    parsedproblems = []
     for prob in theproblems:
+       parsedproblems.append(parseprob(prob))
+
+    theproblemstatements = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)
+    print("number of theproblems", len(theproblems))
+    for prob in parsedproblems:
         print(prob)
         print("-------------")
 
@@ -435,6 +449,52 @@ def mytransform_probhtmlsection(text):
 
     return thetext
 
+#--------------------------------#
+
+def parseprob(text):
+
+    thetext = text
+
+    theproblem = {}
+#    print("==============")
+#    print(thetext)
+    thetitle = ""
+    if '<h3 style="font-weight: bold; font-style: normal">' in thetext:
+        thetitle = re.findall('<h3 style="font-weight: bold; font-style: normal">(.*?)</h3>',thetext)[0]
+    theproblem["title"] = thetitle
+
+    thestatement = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)[0]
+    theproblem["statement"] = thestatement
+
+    theintro = ""
+    if 'div class="intro"' in thetext:
+        theintro = re.findall(r'<div class="intro">(.*?)</div>', thetext, re.DOTALL)[0]
+        theintro = re.sub("&nbsp;", "", theintro)
+        print("found an intro:", theintro)
+    theproblem["intro"] = theintro
+
+    thestatus = ""
+    if '<span class="status">' in thetext:
+        thestatus = re.findall(r'<span class="status">(.*?)</span>', thetext, re.DOTALL)[0]
+        thestatus = re.sub("&nbsp;", "", thestatus)
+        print("found a status:", thestatus)
+    theproblem["status"] = thestatus
+
+    remarks = []
+    theremarks = re.findall(r'<div class="remark">(.*?)</div>', thetext, re.DOTALL)
+    for remark in theremarks:
+        thisremark = {}
+        remarkstatement = re.findall('<span class="body">(.*?)</span>', remark, re.DOTALL)[0]
+        thisremark["statement"] = remarkstatement
+        remarkoriginator = ""
+        if '<span class="by">' in remark:
+            remarkoriginator = re.findall('<span class="by">(.*?)</span>', remark)[0]
+        thisremark["originator"] = remarkoriginator
+        remarks.append(thisremark)
+
+    theproblem["remarks"] = remarks
+
+    return theproblem
 #--------------------------------#
 
 def mytransform_probhtmlmain(text):
