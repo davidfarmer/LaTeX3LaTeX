@@ -389,6 +389,8 @@ def mytransform_probhtml(text):   # schmidt calc 3 temporary
 
     theanswer = transforms.ptx_pp(theanswer)
 
+    theanswer = re.sub(r"<em>(.*?)</em>", r"<term>\1</term>", theanswer)
+
     return theanswer
 
 #--------------------------------#
@@ -452,7 +454,7 @@ def mytransform_probhtmlsection(text):
     print("number of li", thetext.count("<li "))
 
     theptxversion = '<section>\n' 
-    theptxversion += '<title>' + sectiontitle + '<title>\n' 
+    theptxversion += '<title>' + sectiontitle.strip() + '</title>\n' 
 
     if theintroduction.strip():
         theptxversion += '\n<introduction>\n'
@@ -462,14 +464,18 @@ def mytransform_probhtmlsection(text):
     for prob in parsedproblems:
         theptxversion += outputprob(prob)
 
+    theptxversion += "</section>"
+
     return theptxversion
-    return thetext
 
 #--------------------------------#
 
 def outputprob(prob):
 
-    theproblem = '<openquestion>\n'
+    thetag = "openquestion"
+    if "?" not in prob['statement']: thetag="openproblem"
+
+    theproblem = '<' + thetag + '>\n'
 
     if 'title' in prob and prob['title'].strip():
         theproblem += '<title>'
@@ -485,22 +491,24 @@ def outputprob(prob):
     theproblem += prob['statement']
     theproblem += '\n</statement>\n'
 
-    if 'status' in prob and prob['status'].strip():
-        theproblem += '<status>\n'
-        theproblem += prob['status']
-        theproblem += '\n</status>\n'
+#    if 'status' in prob and prob['status'].strip():
+#        theproblem += '<status>\n'
+#        theproblem += prob['status']
+#        theproblem += '\n</status>\n'
 
 
     theremarks = prob['remarks']
     for rem in theremarks:
-        theproblem += '<commentary>\n'
+        theproblem += '<' + rem['tag'] + '>\n'
      # missing poser, intro?
-        theproblem += prob['statement']
-        theproblem += '\n</commentary>\n'
+        theproblem += rem['statement']
+        theproblem += '\n</' + rem['tag'] + '>\n'
 
-    theproblem += '\n</openquestion>\n'
+    theproblem += '\n</' + thetag + '>\n'
 
     return theproblem
+
+#-----------#
 
 def parseprob(text):
 
@@ -524,19 +532,36 @@ def parseprob(text):
         print("found an introduction:", theintro)
     theproblem["introduction"] = theintro
 
-    thestatus = ""
-    if '<span class="status">' in thetext:
-        thestatus = re.findall(r'<span class="status">(.*?)</span>', thetext, re.DOTALL)[0]
-        thestatus = re.sub("&nbsp;", "", thestatus)
-        print("found a status:", thestatus)
-    theproblem["status"] = thestatus
-
     remarks = []
+    thestatus = {}
+    if '<span class="status">' in thetext:
+        thestatuses = re.findall(r'<span class="status">(.*?)</span>', thetext, re.DOTALL)[0]
+        thestatuses = re.sub("&nbsp;", "", thestatuses)
+        print("found a status:", thestatuses)
+        thestatus['statement'] = thestatuses
+        if 'try' in thestatus['statement']:
+            thestatus['tag'] = "suggestion"
+        else:
+            thestatus['tag'] = "status"
+#        theproblem["status"] = thestatus
+        remarks.append(thestatus)
+
     theremarks = re.findall(r'<div class="remark">(.*?)</div>', thetext, re.DOTALL)
     for remark in theremarks:
         thisremark = {}
+        thisremark['tag'] = 'commentary'
         remarkstatement = re.findall('<span class="body">(.*?)</span>', remark, re.DOTALL)[0]
-        thisremark["statement"] = remarkstatement
+        thisremark["statement"] = remarkstatement.strip()
+
+        if 'think' in thisremark["statement"]:
+            thisremark['tag'] = 'opinion'
+
+        if "related" in thisremark["statement"]:
+            thisremark['tag'] = 'context'
+
+        if thisremark["statement"].startswith('If'):
+            thisremark['tag'] = 'status'
+
         remarkoriginator = ""
         if '<span class="by">' in remark:
             remarkoriginator = re.findall('<span class="by">(.*?)</span>', remark)[0]
