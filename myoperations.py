@@ -387,6 +387,8 @@ def mytransform_probhtml(text):   # schmidt calc 3 temporary
     else:
         theanswer =  mytransform_probhtmlmain(thebody)
 
+    theanswer = transforms.ptx_pp(theanswer)
+
     return theanswer
 
 #--------------------------------#
@@ -431,6 +433,8 @@ def mytransform_probhtmlsection(text):
     thetext = re.sub(r'<div class="render">.*?</div>', r"", thetext,1, re.DOTALL)
     print("found the sewction title", sectiontitle);
 
+    theintroduction = ""
+
     # we think this finds the complete problems
 
     theproblems = re.findall(r'<div class="render">(.*?)<div style="clear: right"></div>\s*</div>', thetext, re.DOTALL)
@@ -447,9 +451,56 @@ def mytransform_probhtmlsection(text):
 
     print("number of li", thetext.count("<li "))
 
+    theptxversion = '<section>\n' 
+    theptxversion += '<title>' + sectiontitle + '<title>\n' 
+
+    if theintroduction.strip():
+        theptxversion += '\n<introduction>\n'
+        theptxversion += theintroduction
+        theptxversion += '\n</introduction>\n'
+
+    for prob in parsedproblems:
+        theptxversion += outputprob(prob)
+
+    return theptxversion
     return thetext
 
 #--------------------------------#
+
+def outputprob(prob):
+
+    theproblem = '<openquestion>\n'
+
+    if 'title' in prob and prob['title'].strip():
+        theproblem += '<title>'
+        theproblem += prob['title']
+        theproblem += '</title>\n'
+
+    if 'introduction' in prob and prob['introduction'].strip():
+        theproblem += '<introduction>\n'
+        theproblem += prob['introduction']
+        theproblem += '\n</introduction>\n'
+
+    theproblem += '<statement>\n'
+    theproblem += prob['statement']
+    theproblem += '\n</statement>\n'
+
+    if 'status' in prob and prob['status'].strip():
+        theproblem += '<status>\n'
+        theproblem += prob['status']
+        theproblem += '\n</status>\n'
+
+
+    theremarks = prob['remarks']
+    for rem in theremarks:
+        theproblem += '<commentary>\n'
+     # missing poser, intro?
+        theproblem += prob['statement']
+        theproblem += '\n</commentary>\n'
+
+    theproblem += '\n</openquestion>\n'
+
+    return theproblem
 
 def parseprob(text):
 
@@ -470,8 +521,8 @@ def parseprob(text):
     if 'div class="intro"' in thetext:
         theintro = re.findall(r'<div class="intro">(.*?)</div>', thetext, re.DOTALL)[0]
         theintro = re.sub("&nbsp;", "", theintro)
-        print("found an intro:", theintro)
-    theproblem["intro"] = theintro
+        print("found an introduction:", theintro)
+    theproblem["introduction"] = theintro
 
     thestatus = ""
     if '<span class="status">' in thetext:
@@ -505,7 +556,7 @@ def mytransform_probhtmlmain(text):
 
 #####################################
 
-def mytransform_mbx_remove_linefeeds(text):
+def mytransform_ptx_remove_linefeeds(text):
 
     thetext = text
 
@@ -541,7 +592,7 @@ def mytransform_mbx_remove_linefeeds(text):
 
 ##################
 
-def mytransform_mbx_linefeeds(text):
+def mytransform_ptx_linefeeds(text):
 
     thetext = text
 
@@ -572,7 +623,7 @@ def mytransform_mbx_linefeeds(text):
 
     return thetext
 
-def mytransform_mbx_tag(txt, outertag, introtag, conclusiontag, innertags):
+def mytransform_ptx_tag(txt, outertag, introtag, conclusiontag, innertags):
 
     the_text = txt.group(1)
 
@@ -646,7 +697,7 @@ def mytransform_mbx_tag(txt, outertag, introtag, conclusiontag, innertags):
 
     return the_answer
 
-def mytransform_mbx_act(txt):
+def mytransform_ptx_act(txt):
 
     the_text = txt.group(1)
 
@@ -718,7 +769,7 @@ def mytransform_mbx_act(txt):
 
     return "<activity" + the_start + the_text + "</activity>"
 
-def mytransform_mbx_parentheses(text):
+def mytransform_ptx_parentheses(text):
 
     thetext = text
 
@@ -919,13 +970,13 @@ def replaceabs(txt):
 
 ###############
 
-def mytransform_mbx_img_fig(text):
+def mytransform_ptx_img_fig(text):
 
     thetext = text
 
 #    thetext = re.sub(r"<cell(.*?)</cell>",cell_hack,thetext,0,re.DOTALL)
 #
-#    thetext = mytransform_mbx_figure(thetext)
+#    thetext = mytransform_ptx_figure(thetext)
 
 #    thetext = process_fig_mult(thetext)
 
@@ -951,14 +1002,14 @@ def deduplicate_id(txt):
     return '<image xml:id="' + this_id + '" >'
 
 ################
-def mytransform_mbx_cell(text):
+def mytransform_ptx_cell(text):
 
     thetext = text
 
 #    thetext = re.sub(r"<sidebyside(.*?)</sidebyside>",sbs_hack,thetext,0,re.DOTALL)
     thetext = re.sub(r"<cell(.*?)</cell>",cell_hack,thetext,0,re.DOTALL)
 
-    thetext = mytransform_mbx_figure(thetext)
+    thetext = mytransform_ptx_figure(thetext)
 
     return thetext
 
@@ -1001,7 +1052,7 @@ def sbs_hack(txt):
 
 ##################
 
-def mytransform_mbx_figure(text):
+def mytransform_ptx_figure(text):
 
     thetext = text
 
@@ -1011,7 +1062,7 @@ def mytransform_mbx_figure(text):
 
 ##################
 
-def old_mytransform_mbx(text):
+def old_mytransform_ptx(text):
 
     thetext = text
 

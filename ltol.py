@@ -339,9 +339,9 @@ for inputfile, outputfile in component.iofilepairs:
 
     if component.filetype_plus in ['mbx_pp', 'ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx']:
 
-        component.onefile = myoperations.mytransform_mbx_remove_linefeeds(component.onefile)
+        component.onefile = myoperations.mytransform_ptx_remove_linefeeds(component.onefile)
 
-        component.onefile = transforms.mbx_pp(component.onefile)
+        component.onefile = transforms.ptx_pp(component.onefile)
 
         component.onefile = myoperations.mytransform_mbx_linefeeds(component.onefile)
 

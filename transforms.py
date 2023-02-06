@@ -9,7 +9,7 @@ import myoperations
 
 ###################
 
-def mbx_fix(text):
+def ptx_fix(text):
     """ Correct some authoring shortcuts.
 
     """
@@ -24,7 +24,7 @@ def mbx_fix(text):
 
 ###################
 
-def mbx_strict(text):
+def ptx_strict(text):
     """ Remove white space that confuses xslt.
 
     """
@@ -47,7 +47,7 @@ def mbx_strict(text):
 
 ###################
 
-def mbx_strict_tex(text):
+def ptx_strict_tex(text):
     # Nothing here yet
 
     # need to worry about things like white space in paragraphs
@@ -58,7 +58,7 @@ def mbx_strict_tex(text):
 
 ###################
 
-def mbx_strict_html(text):
+def ptx_strict_html(text):
     """ Rewrite some markup that confuses HTML/MathJax.
 
     """
@@ -77,7 +77,7 @@ def mbx_strict_html(text):
 
 ###################
 
-def mbx_fa(text):
+def ptx_fa(text):
     """ replace f(x) by \fa{f}{x}.
 
     """
@@ -208,7 +208,7 @@ def html_pp(text):
 
 ###################
 
-def mbx_pp(text):
+def ptx_pp(text):
     """ Pretty-print MBX source.
 
     """
@@ -393,22 +393,22 @@ def text_to_p_ul_ol(the_statement, the_answer_variables, wrapper):
     previous_par = ""
     ulol_mode = ""
     in_list = False
-    the_statement_p_mbx = []
+    the_statement_p_ptx = []
     for par in the_statement_p:
      #   print "THIS par", par
         par = par.strip()
         if not par:
             if current_par == "p":
-                the_statement_p_mbx[-1] += "</p>"
+                the_statement_p_ptx[-1] += "</p>"
                 current_par = ""
                 previous_par = ""
             elif current_par == "li":
-                the_statement_p_mbx[-1] += "</p></li>\n"
-      #          the_statement_p_mbx[-1] += "</" + ulol_mode + ">\n"
+                the_statement_p_ptx[-1] += "</p></li>\n"
+      #          the_statement_p_ptx[-1] += "</" + ulol_mode + ">\n"
                 current_par = ""
                 previous_par = "li"
-              #  the_statement_p_mbx[-1] += "\n</ul>\n</p>"
-               # the_statement_p_mbx[-1] += "\n</" + ulol_mode + ">\n</p>"
+              #  the_statement_p_ptx[-1] += "\n</ul>\n</p>"
+               # the_statement_p_ptx[-1] += "\n</" + ulol_mode + ">\n</p>"
              #   pass  # because we don't know yet if the ol/ul has finished
             continue
 
@@ -462,16 +462,16 @@ def text_to_p_ul_ol(the_statement, the_answer_variables, wrapper):
             current_par = "p"
             previous_par = ""
        
-        the_statement_p_mbx.append(par)
+        the_statement_p_ptx.append(par)
 
     if current_par == "li":   # unfinished list to be completed
-        the_statement_p_mbx[-1] += "\n</p></li>\n</" + ulol_mode + ">\n</p>"
+        the_statement_p_ptx[-1] += "\n</p></li>\n</" + ulol_mode + ">\n</p>"
     elif current_par == "p":
-        the_statement_p_mbx[-1] += "</p>" + "\n"
+        the_statement_p_ptx[-1] += "</p>" + "\n"
 
-    the_statement_mbx = "<" + wrapper + ">" + "\n"
-    the_statement_mbx += "\n".join(the_statement_p_mbx)
-    the_statement_mbx += "\n</" + wrapper + ">" + "\n"
+    the_statement_ptx = "<" + wrapper + ">" + "\n"
+    the_statement_ptx += "\n".join(the_statement_p_ptx)
+    the_statement_ptx += "\n</" + wrapper + ">" + "\n"
   
-    return the_statement_mbx
+    return the_statement_ptx
 
