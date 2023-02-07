@@ -250,7 +250,7 @@ def ptx_pp(text):
         component.lipcounter[lip_tag] = 0
         thetext = utilities.tag_to_numbered_tag(lip_tag, thetext)
 
-        print("found", component.lipcounter)
+#        print("found", component.lipcounter)
         for n in range(component.lipcounter[lip_tag]):
             if lip_tag == "li":  # note: now the same as the else case!
                 thetext = postprocess.tag_before_after(lip_tag + str(n), "\n\n", "\n", "\n", "\n\n", thetext)

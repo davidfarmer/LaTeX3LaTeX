@@ -529,7 +529,7 @@ def parseprob(text):
     if 'div class="intro"' in thetext:
         theintro = re.findall(r'<div class="intro">(.*?)</div>', thetext, re.DOTALL)[0]
         theintro = re.sub("&nbsp;", "", theintro)
-        print("found an introduction:", theintro)
+   #     print("found an introduction:", theintro)
     theproblem["introduction"] = theintro
 
     remarks = []
@@ -537,7 +537,7 @@ def parseprob(text):
     if '<span class="status">' in thetext:
         thestatuses = re.findall(r'<span class="status">(.*?)</span>', thetext, re.DOTALL)[0]
         thestatuses = re.sub("&nbsp;", "", thestatuses)
-        print("found a status:", thestatuses)
+   #     print("found a status:", thestatuses)
         thestatus['statement'] = thestatuses
         if 'try' in thestatus['statement']:
             thestatus['tag'] = "suggestion"
@@ -582,7 +582,8 @@ def mytransform_probhtmlmain(text):
 
     docinfo = '<docinfo>' + '\n'
 
-    documentid = "AimPL-" + "abcde"  # need to scan from document
+    plid = re.findall(r'pl_id = "(.*?)"', thetext)[0]
+    documentid = "AimPL-" + plid
 
     themacros = r"\newcomand{\R}{\mathbb R}"  # shoudl call this from a function
 
@@ -591,19 +592,60 @@ def mytransform_probhtmlmain(text):
 
     docinfo += '</docinfo>' + '\n'
 
-    thearticle = '<article>' + '\n'
+    thehead = re.sub(r"<h3>Sections</h3>.*", "", thetext, 1, re.DOTALL)
+    thehead = re.sub(r'.*<div class="render">', "", thehead, 1, re.DOTALL)
+    thehead = thehead.strip()
+    theabstract = re.findall(r'<div>(.*?)</div>', thehead, re.DOTALL)[0]
+    theabstract = '<abstract><p>' + theabstract + '</p></abtract>'
 
-    numsec = 2
+    thetitle = re.findall(r'<h2 class="pl-title">(.*?)</h2>', thehead)[0]
+
+    editors = []
+    theeditors = re.findall(r'<h3 class="editors">Edited by (.*?)</h3>', thetext)[0]
+    theeditors = re.findall(r'<span class="by-id">org.aimpl.user:(.*?)</span>', theeditors)
+    print("theeditors", theeditors)
+    for editor in theeditors:
+        if "@" in editor:
+            thiseditor = {'email': editor}
+        else:
+            thiseditor = {'id': editor}
+            print("editor with no email", thiseditor)
+        editors.append(thiseditor)
+    ptxeditor = '<editors>' + '\n'
+    for editor in editors:
+        thiseditor = '<person'
+        for editorattribute in editor:
+            thisattribute = editorattribute
+            thiseditor += ' ' + editorattribute + '="' + editor[editorattribute] + '"'
+        thiseditor += '/>' + '\n'
+        ptxeditor += thiseditor
+    ptxeditor += '</editors/>' + '\n'
+
+    frontmatter = '<frontmatter>' + '\n'
+    frontmatter += '<titlepage>' + '\n'
+    frontmatter += ptxeditor
+    frontmatter += '</titlepage>' + '\n'
+    frontmatter += theabstract
+    frontmatter += '</frontmatter>' + '\n'
+
+    thearticle = '<article>' + '\n'
+    thearticle += '<title>' + thetitle + '</title>' + '\n'
+
+    thearticle += frontmatter
+
+    thetoc = re.findall('<ol class="sectionlist">(.*?)</ol>', thetext, re.DOTALL)[0]
+    numsec = thetoc.count("<li>")
 
     for sec in range(1, numsec+1):
 
         secid = str(sec)
 
-        thearticle += '<xi:include href="./' + 'section' + secid + '.ptx"/>' + '\n'
+        thearticle += '<xi:include href="./' + plid + '-sec-' + secid + '.ptx"/>' + '\n'
+
+    theptxversion += docinfo
 
     thearticle += '</article>' + '\n'
 
-    theptxversion += docinfo
     theptxversion += thearticle
 
     theptxversion += '</pretext>' + '\n'

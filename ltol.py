@@ -152,16 +152,16 @@ else:
     fileextension_in = component.filetype_plus
     fileextension_out = component.filetype_plus
 
-print("here", component.filetype_plus)
-print("here 1", os.path.isfile(component.inputname))
-print("here 1", component.inputname)
-print("here 2", os.path.isdir(component.outputname))
-print("here 2b", component.outputname)
-print("here 2a", os.path.isdir("/Users/farmer/AIM/AlexandersonAward/ReprintList/xxxx"))
-print("here 3b", not dorecursive)
-print("here 3a", dorecursive)
-print("here 3c", not dorecursive)
-print("here 4", os.path.isdir(component.inputname) and os.path.isdir(component.outputname) and (not dorecursive))
+#print("here", component.filetype_plus)
+#print("here 1", os.path.isfile(component.inputname))
+#print("here 1", component.inputname)
+#print("here 2", os.path.isdir(component.outputname))
+#print("here 2b", component.outputname)
+#print("here 2a", os.path.isdir("/Users/farmer/AIM/AlexandersonAward/ReprintList/xxxx"))
+#print("here 3b", not dorecursive)
+#print("here 3a", dorecursive)
+#print("here 3c", not dorecursive)
+#print("here 4", os.path.isdir(component.inputname) and os.path.isdir(component.outputname) and (not dorecursive))
 if os.path.isfile(component.inputname) and not os.path.isdir(component.outputname):
     component.iofilepairs.append([component.inputname,component.outputname])
     print("converting one file:",component.inputname)
