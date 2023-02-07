@@ -483,6 +483,11 @@ def outputprob(prob):
         theproblem += prob['title']
         theproblem += '</title>\n'
 
+    if 'originator' in prob and prob['originator'].strip():
+        theproblem += '<originator>'
+        theproblem += prob['originator']
+        theproblem += '</originator>\n'
+
     if 'introduction' in prob and prob['introduction'].strip():
         theproblem += '<introduction>\n'
         theproblem += '\n<p>\n'
@@ -505,6 +510,11 @@ def outputprob(prob):
     theremarks = prob['remarks']
     for rem in theremarks:
         theproblem += '<' + rem['tag'] + '>\n'
+        if 'originator' in rem and rem['originator'].strip():
+            theproblem += '<originator>' + '\n'
+            theproblem += '<person aimplid="' + rem['originator'] + '"/>'
+            theproblem += '\n</originator>\n'
+
         theproblem += '<p>\n'
      # missing poser, intro?
         theproblem += rem['statement']
@@ -571,7 +581,7 @@ def parseprob(text):
 
         remarkoriginator = ""
         if '<span class="by">' in remark:
-            remarkoriginator = re.findall('<span class="by">(.*?)</span>', remark)[0]
+            remarkoriginator = re.findall('<span class="by-id">(.*?)</span>', remark)[0]
         thisremark["originator"] = remarkoriginator
         remarks.append(thisremark)
 
@@ -619,15 +629,16 @@ def mytransform_probhtmlmain(text):
             thiseditor = {'id': editor}
             print("editor with no email", thiseditor)
         editors.append(thiseditor)
-    ptxeditor = '<editors>' + '\n'
+    ptxeditor = ""
     for editor in editors:
+        thiseditor = '<editor>' + '\n'
         thiseditor = '<person'
         for editorattribute in editor:
             thisattribute = editorattribute
             thiseditor += ' ' + editorattribute + '="' + editor[editorattribute] + '"'
         thiseditor += '/>' + '\n'
         ptxeditor += thiseditor
-    ptxeditor += '</editors/>' + '\n'
+        ptxeditor += '</editor/>' + '\n'
 
     frontmatter = '<frontmatter>' + '\n'
     frontmatter += '<titlepage>' + '\n'
