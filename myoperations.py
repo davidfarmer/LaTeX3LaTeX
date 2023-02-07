@@ -371,9 +371,7 @@ def mytransform_ldata(text):
   
 #########3
 
-def mytransform_probhtml(text):   # schmidt calc 3 temporary
-#def mbx_fix(text):   # schmidt calc 3 temporary
-
+def mytransform_probhtml(text):
 
     thetext = text
 
@@ -430,6 +428,7 @@ def mytransform_probhtmlsection(text):
     # find the title
     
     sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetext,1, re.DOTALL)
+    # remove the "NUMBER. " before the title
     sectiontitle = re.sub("^\S+\s+", "", sectiontitle)
     # delete the div.render containing the page title
     thetext = re.sub(r'<div class="render">.*?</div>', r"", thetext,1, re.DOTALL)
@@ -458,7 +457,9 @@ def mytransform_probhtmlsection(text):
 
     if theintroduction.strip():
         theptxversion += '\n<introduction>\n'
+        theptxversion += '<p>\n'
         theptxversion += theintroduction
+        theptxversion += '\n</p>\n'
         theptxversion += '\n</introduction>\n'
 
     for prob in parsedproblems:
@@ -484,11 +485,15 @@ def outputprob(prob):
 
     if 'introduction' in prob and prob['introduction'].strip():
         theproblem += '<introduction>\n'
+        theproblem += '\n<p>\n'
         theproblem += prob['introduction']
+        theproblem += '\n</p>\n'
         theproblem += '\n</introduction>\n'
 
     theproblem += '<statement>\n'
+    theproblem += '<p>\n'
     theproblem += prob['statement']
+    theproblem += '\n</p>\n'
     theproblem += '\n</statement>\n'
 
 #    if 'status' in prob and prob['status'].strip():
@@ -500,8 +505,10 @@ def outputprob(prob):
     theremarks = prob['remarks']
     for rem in theremarks:
         theproblem += '<' + rem['tag'] + '>\n'
+        theproblem += '<p>\n'
      # missing poser, intro?
         theproblem += rem['statement']
+        theproblem += '</p>\n'
         theproblem += '\n</' + rem['tag'] + '>\n'
 
     theproblem += '\n</' + thetag + '>\n'
@@ -539,7 +546,7 @@ def parseprob(text):
         thestatuses = re.sub("&nbsp;", "", thestatuses)
    #     print("found a status:", thestatuses)
         thestatus['statement'] = thestatuses
-        if 'try' in thestatus['statement']:
+        if ' try' in thestatus['statement']:
             thestatus['tag'] = "suggestion"
         else:
             thestatus['tag'] = "status"
@@ -553,10 +560,10 @@ def parseprob(text):
         remarkstatement = re.findall('<span class="body">(.*?)</span>', remark, re.DOTALL)[0]
         thisremark["statement"] = remarkstatement.strip()
 
-        if 'think' in thisremark["statement"]:
+        if ' think' in thisremark["statement"]:
             thisremark['tag'] = 'opinion'
 
-        if "related" in thisremark["statement"]:
+        if " related" in thisremark["statement"]:
             thisremark['tag'] = 'context'
 
         if thisremark["statement"].startswith('If'):
