@@ -632,13 +632,13 @@ def mytransform_probhtmlmain(text):
     ptxeditor = ""
     for editor in editors:
         thiseditor = '<editor>' + '\n'
-        thiseditor = '<person'
+        thiseditor += '<person'
         for editorattribute in editor:
             thisattribute = editorattribute
             thiseditor += ' ' + editorattribute + '="' + editor[editorattribute] + '"'
         thiseditor += '/>' + '\n'
         ptxeditor += thiseditor
-        ptxeditor += '</editor/>' + '\n'
+        ptxeditor += '</editor>' + '\n'
 
     frontmatter = '<frontmatter>' + '\n'
     frontmatter += '<titlepage>' + '\n'
