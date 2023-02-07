@@ -352,6 +352,12 @@ def ptx_pp(text):
     # and punctuation after /line
     thetext = re.sub(r"(</line>)\s*((\?|!|;|:|,|\.|\)|</)+) *?", r"\1\2", thetext)
 
+#   "put back verbatim environments"
+    for tag in component.verbatim_tags:
+         thetext = re.sub(r"A(" + tag + ")B(.{40})ENDZ *",
+                                    utilities.sha1undigest,thetext)
+    thetext = re.sub(r" *ACOMMB(.{40})ENDZ *", utilities.sha1undigest,thetext)
+
 #    print thetext
     return thetext
 

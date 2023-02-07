@@ -577,7 +577,38 @@ def mytransform_probhtmlmain(text):
 
     thetext = text
 
-    return thetext
+    theptxversion = '<?xml version="1.0" encoding="UTF-8" ?>' + '\n'
+    theptxversion += '<pretext xmlns:xi="http://www.w3.org/2001/XInclude" xml:lang="en-US">' + '\n'
+
+    docinfo = '<docinfo>' + '\n'
+
+    documentid = "AimPL-" + "abcde"  # need to scan from document
+
+    themacros = r"\newcomand{\R}{\mathbb R}"  # shoudl call this from a function
+
+    docinfo += '<document-id>' + documentid + '</document-id>' + '\n'
+    docinfo += '<macros>' + '\n' + themacros + '\n' + '</macros>' + '\n'
+
+    docinfo += '</docinfo>' + '\n'
+
+    thearticle = '<article>' + '\n'
+
+    numsec = 2
+
+    for sec in range(1, numsec+1):
+
+        secid = str(sec)
+
+        thearticle += '<xi:include href="./' + 'section' + secid + '.ptx"/>' + '\n'
+
+    thearticle += '</article>' + '\n'
+
+    theptxversion += docinfo
+    theptxversion += thearticle
+
+    theptxversion += '</pretext>' + '\n'
+
+    return theptxversion
 
 #####################################
 
