@@ -584,6 +584,7 @@ def mytransform_probhtmlmain(text):
 
     plid = re.findall(r'pl_id = "(.*?)"', thetext)[0]
     documentid = "AimPL-" + plid
+    component.aimplid = plid
 
     themacros = r"\newcomand{\R}{\mathbb R}"  # shoudl call this from a function
 
@@ -640,7 +641,7 @@ def mytransform_probhtmlmain(text):
 
         secid = str(sec)
 
-        thearticle += '<xi:include href="./' + plid + '-sec-' + secid + '.ptx"/>' + '\n'
+        thearticle += '<xi:include href="./' + plid + '-section' + secid + '.ptx"/>' + '\n'
 
     theptxversion += docinfo
 

@@ -30,6 +30,8 @@ generic_list = []
 topic = "combinatorics"
 topic = "calculus_single"
 
+aimplid = "AA"
+
 foundvalues = []
 startagain = ""
 maybe_bad = 0

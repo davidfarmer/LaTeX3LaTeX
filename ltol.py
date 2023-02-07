@@ -188,7 +188,7 @@ elif os.path.isdir(component.inputname) and os.path.isdir(component.outputname) 
         if fileextension_in and fileextension_in != fileextension_out:
             outputfilename = re.sub(fileextension_in + "$", fileextension_out, outputfilename)
         if component.inputfilename == outputfilename:
-            print("big problem, quitting")
+            print("big problem: output file will over-write input file, quitting")
         component.iofilepairs.append([component.inputfilename, outputfilename])
   #  print thefiles
   #  print inputdir 
@@ -238,25 +238,6 @@ if component.filetype_plus in ['mbx_permid', 'ptx_permid', 'xml_permid']:
     component.permid_base_number = len(component.all_permid) + 123
     component.current_permid = component.permid_base_number
     print("starting permid:", component.current_permid)
-
-#listofpermids.sort()
-#component.all_permid.sort()
-#
-#print listofpermids
-#print component.all_permid
-#
-#print len(listofpermids)
-#print len(component.all_permid)
-
-#print listofpermids == component.all_permid
-
-#for nn in range(70,100):
-#    print nn, listofpermids[nn], component.all_permid[nn]
-
-#for count, theid in enumerate(listofpermids):
-#    print count, theid == component.all_permid[count]
-
-#die()
 
 print("about to loop over files:", component.iofilepairs)
 
@@ -445,6 +426,12 @@ for inputfile, outputfile in component.iofilepairs:
             outfile.write(this_matrix_formatted)
                 
     elif component.onefile and component.filetype_plus != "ldata":
+        if component.filetype_plus == "probhtml":
+            outputfile = re.sub("/([^/]+)$", "/" + component.aimplid + r"-\1", outputfile)
+
+        print("component.aimplid", component.aimplid)
+        print("outputfile", outputfile)
+
         with open(outputfile, 'w') as outfile:
             outfile.write(component.onefile)
 
