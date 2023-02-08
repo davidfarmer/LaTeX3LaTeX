@@ -426,15 +426,18 @@ def mytransform_probhtmlsection(text):
     thetext = re.sub('<div class="nav-inner">.*?<ul>.*?</ul>', "", thetext, 0, re.DOTALL)
 
     # find the title
+
+    thetitleandintro = re.findall('<div class="render">.*?</div>', thetext, re.DOTALL)[0]
     
-    sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetext,1, re.DOTALL)
+    sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetitleandintro,1, re.DOTALL)
     # remove the "NUMBER. " before the title
     sectiontitle = re.sub("^\S+\s+", "", sectiontitle)
-    # delete the div.render containing the page title
+    sectionintro = re.sub(r'.*</h2>', "", thetitleandintro, 1, re.DOTALL)
+    sectionintro = re.sub(r'</div>.*', "", sectionintro, 1, re.DOTALL)
+    sectionintro = sectionintro.strip()
+    # delete the div.render containing the page title and intro
     thetext = re.sub(r'<div class="render">.*?</div>', r"", thetext,1, re.DOTALL)
     print("found the sewction title", sectiontitle);
-
-    theintroduction = ""
 
     # we think this finds the complete problems
 
@@ -455,12 +458,12 @@ def mytransform_probhtmlsection(text):
     theptxversion = '<section>\n' 
     theptxversion += '<title>' + sectiontitle.strip() + '</title>\n' 
 
-    if theintroduction.strip():
-        theptxversion += '\n<introduction>\n'
+    if sectionintro:
+#        theptxversion += '\n<introduction>\n'
         theptxversion += '<p>\n'
-        theptxversion += theintroduction
+        theptxversion += sectionintro
         theptxversion += '\n</p>\n'
-        theptxversion += '\n</introduction>\n'
+#        theptxversion += '\n</introduction>\n'
 
     for prob in parsedproblems:
         theptxversion += outputprob(prob)
@@ -538,6 +541,10 @@ def parseprob(text):
     if '<h3 style="font-weight: bold; font-style: normal">' in thetext:
         thetitle = re.findall('<h3 style="font-weight: bold; font-style: normal">(.*?)</h3>',thetext)[0]
     theproblem["title"] = thetitle
+
+    if '<span class="probheadby"' in thetext:
+        theposer = re.findall('<span class="probheadby">\[(.*?)\]</span>', thetext)[0]
+        theproblem['originator'] = theposer
 
     thestatement = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)[0]
     theproblem["statement"] = thestatement
