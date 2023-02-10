@@ -269,41 +269,41 @@ def mytransform_ldata(text):
         thetext = re.sub(r"\\\s+", "", thetext)
         thetext = re.sub("\s", "", thetext)
         thetext = re.sub("`[0-9]+\.[0-9]+", "", thetext)
-  
+
         if refineddata:
    #     thesortofweight = re.search(r'^itemtosave *= *{"R[0,1]_C([0-9]+)",', thetext).group(1)
           thesortofweight = re.search(r'^itemtosave *= *{"ckappa_rdelta_([0-9]+)",', thetext).group(1)
           print("found thesortofweight", thesortofweight)
    #     thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)", *', "", thetext)
           thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)[^"]+", *', "", thetext)
-  
+
           # save version
           version = re.search('^([^,]+),', thetext).group(1)
           thetext = re.sub('^([^,]+),', "", thetext)
-  
+
           # save equationlist
           equationlist = re.search('^([^,]+),', thetext).group(1)
           thetext = re.sub('^([^,]+),', "", thetext)
-  
+
           thedata, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
-  
+
           errormeasures, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
-  
+
           searchparameters, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
-  
+
           parameterchanges, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
-  
+
           startingvalues, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
 
           this_value = "{" + thesortofweight + "," + thedata + "}"
 
           component.foundvalues.append(this_value)
-    
+
           thetext = thetext[1:]
 
           if thetext:
@@ -317,11 +317,11 @@ def mytransform_ldata(text):
           print("found thesortofweight", thesortofweight)
           thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)", *', "", thetext)
 
-  
+
           startval, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
           print(thetext[:50])
-  
+
           if len(startval) > 40:  # startval is actually lamset
               lamset = startval
               startval = "{999, 999}"
@@ -329,9 +329,9 @@ def mytransform_ldata(text):
               lamset, thetext = utilities.first_bracketed_string(thetext)
               thetext = re.sub("^\s*,*", "", thetext)
               print(thetext[:50])
-  
+
           lamset = re.sub(r"^{", "{" + thesortofweight + ",", lamset)
-  
+
           func_eq, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
           euler_prod, thetext = utilities.first_bracketed_string(thetext)
@@ -345,30 +345,30 @@ def mytransform_ldata(text):
           coeff_precision, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
           print("lamset", lamset, "coefficients_set", coefficients_set[:20])
-  
+
           if not (eig_precision.startswith("{0.0") or eig_precision.startswith("{0``")) and "*^-" not in eig_precision:
       #  if not eig_precision.startswith("{0.0") and "*^-" not in eig_precision:
               component.maybe_bad += 1
               print(component.maybe_bad, "LOW PRECISION?", eig_precision)
               component.startagain += startval
       #      return ""
-  
+
           else:
               this_value = "{" + lamset + "," + coefficients_set + "," + eig_precision + "," + coeff_precision + "," + search_params + "}"
-  
+
               component.foundvalues.append(this_value)
-  
+
     #    if "Null" in text:
     #        print "             Null:  NEED TO TRY AGAIN AT", startval
     #        component.startagain += startval
-  
+
           thetext = thetext[1:]
-  
+
           if thetext:
               thetext = mytransform_ldata(thetext)
-  
+
           return thetext
-  
+
 #########3
 
 def mytransform_probhtml(text):
@@ -379,15 +379,38 @@ def mytransform_probhtml(text):
 
     thebody = re.sub(r".*<body>(.*)</body>.*", r"\1", thetext, 1, re.DOTALL)
 
+    # remove leading which space on each line
+    thebody = re.sub(r"^ +", "", thebody, 0, re.M)
+    # remove comments
+    thebody = re.sub("<!--.*?-->", "", thebody, 0, re.DOTALL)
+    thebody = re.sub(r"<br />", "\n\n", thebody)
+    # remove functionality markup
+    thebody = re.sub('<a class="edit.*?</a>', "", thebody, 0, re.DOTALL)
+    thebody = re.sub('<span class="edit.*?</span>', "", thebody, 0, re.DOTALL)
+    thebody = re.sub('<ul class="pending-additions"></ul>', "", thebody)
+    thebody = re.sub('<ul class="pending-changes"></ul>', "", thebody)
+    # maybe keep this one, but check if it is nonempty to flag changes that
+    # need to be incorporated before converting
+#    thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
+
+    # remove excessive blank lines
+    thebody = re.sub("\n\n+", "\n\n", thebody)
+
     if "section-title" in thebody:
         theanswer =  mytransform_probhtmlsection(thebody)
 
     else:
         theanswer =  mytransform_probhtmlmain(thebody)
 
+    theanswer = texmathtopretext(theanswer)
+
     theanswer = transforms.ptx_pp(theanswer)
 
     theanswer = re.sub(r"<em>(.*?)</em>", r"<term>\1</term>", theanswer)
+    theanswer = re.sub(r"&quot;(.*?)&quot", r"<q>\1</q>", theanswer)
+    theanswer = re.sub(r"“(.*?)”", r"<q>\1</q>", theanswer)
+    theanswer = re.sub(r"’", r"'", theanswer)
+    theanswer = re.sub(r"(\[<a .*?</a>])", r"<!--\1-->", theanswer)
 
     return theanswer
 
@@ -399,28 +422,14 @@ def mytransform_probhtmlsection(text):
     thetext = text
 
     thetext = re.sub(r'<div id="breadc.*?</div>', "", thetext, 1, re.DOTALL)
-
     # remove script tags
     thetext = re.sub(r'<script>.*?</script>', "", thetext, 0, re.DOTALL)
 
-    # remove leading which space on each line
-    thetext = re.sub(r"^ +", "", thetext, 0, re.M)
-    # remove blank lines
-    thetext = re.sub("\n+", "\n", thetext)
-    # remove comments
-    thetext = re.sub("<!--.*?-->", "", thetext, 0, re.DOTALL)
+
+
     # remove some html formatting
 #    thetext = re.sub('<div class="clear.*?</div>', "", thetext, 0, re.DOTALL)
 #    thetext = re.sub('<div style="clear.*?</div>', "", thetext, 0, re.DOTALL)
-
-    # remove functionality markup
-    thetext = re.sub('<a class="edit.*?</a>', "", thetext, 0, re.DOTALL)
-    thetext = re.sub('<span class="edit.*?</span>', "", thetext, 0, re.DOTALL)
-    thetext = re.sub('<ul class="pending-additions"></ul>', "", thetext)
-    thetext = re.sub('<ul class="pending-changes"></ul>', "", thetext)
-    # maybe keep this one, but check if it is nonempty to flag changes that
-    # need to be incorporated before converting
-#    thetext = re.sub('<ul class="pending.*?</ul>', "", thetext, 0, re.DOTALL)
 
     # remove TOC
     thetext = re.sub('<div class="nav-inner">.*?<ul>.*?</ul>', "", thetext, 0, re.DOTALL)
@@ -428,7 +437,7 @@ def mytransform_probhtmlsection(text):
     # find the title
 
     thetitleandintro = re.findall('<div class="render">.*?</div>', thetext, re.DOTALL)[0]
-    
+
     sectiontitle = re.sub(r'.*<h2 class="section-title">(.*?)</h2>.*', r"\1", thetitleandintro,1, re.DOTALL)
     # remove the "NUMBER. " before the title
     sectiontitle = re.sub("^\S+\s+", "", sectiontitle)
@@ -455,8 +464,8 @@ def mytransform_probhtmlsection(text):
 
     print("number of li", thetext.count("<li "))
 
-    theptxversion = '<section>\n' 
-    theptxversion += '<title>' + sectiontitle.strip() + '</title>\n' 
+    theptxversion = '<section>\n'
+    theptxversion += '<title>' + sectiontitle.strip() + '</title>\n'
 
     if sectionintro:
 #        theptxversion += '\n<introduction>\n'
@@ -488,7 +497,7 @@ def outputprob(prob):
 
     if 'originator' in prob and prob['originator'].strip():
         theproblem += '<originator>'
-        theproblem += prob['originator']
+        theproblem += '<personname>' + prob['originator'] + '</personname>'
         theproblem += '</originator>\n'
 
     if 'introduction' in prob and prob['introduction'].strip():
@@ -515,7 +524,9 @@ def outputprob(prob):
         theproblem += '<' + rem['tag'] + '>\n'
         if 'originator' in rem and rem['originator'].strip():
             theproblem += '<originator>' + '\n'
-            theproblem += '<person aimplid="' + rem['originator'] + '"/>'
+#  use once the preprocessor can handle it
+#            theproblem += '<person aimplid="' + rem['originator'] + '"/>'
+            theproblem += '<personname>aimplid ' + rem['originator'] + '</personname>'
             theproblem += '\n</originator>\n'
 
         theproblem += '<p>\n'
@@ -573,7 +584,7 @@ def parseprob(text):
     theremarks = re.findall(r'<div class="remark">(.*?)</div>', thetext, re.DOTALL)
     for remark in theremarks:
         thisremark = {}
-        thisremark['tag'] = 'commentary'
+        thisremark['tag'] = 'suggestion'
         remarkstatement = re.findall('<span class="body">(.*?)</span>', remark, re.DOTALL)[0]
         thisremark["statement"] = remarkstatement.strip()
 
@@ -610,7 +621,7 @@ def mytransform_probhtmlmain(text):
     documentid = "AimPL-" + plid
     component.aimplid = plid
 
-    themacros = r"\newcomand{\R}{\mathbb R}"  # shoudl call this from a function
+    themacros = utilities.standardmacros
 
     docinfo += '<document-id>' + documentid + '</document-id>' + '\n'
     docinfo += '<macros>' + '\n' + themacros + '\n' + '</macros>' + '\n'
@@ -621,7 +632,7 @@ def mytransform_probhtmlmain(text):
     thehead = re.sub(r'.*<div class="render">', "", thehead, 1, re.DOTALL)
     thehead = thehead.strip()
     theabstract = re.findall(r'<div>(.*?)</div>', thehead, re.DOTALL)[0]
-    theabstract = '<abstract><p>' + theabstract + '</p></abtract>'
+    theabstract = '<abstract><p>' + theabstract + '</p></abstract>'
 
     thetitle = re.findall(r'<h2 class="pl-title">(.*?)</h2>', thehead)[0]
 
@@ -639,11 +650,16 @@ def mytransform_probhtmlmain(text):
     ptxeditor = ""
     for editor in editors:
         thiseditor = '<editor>' + '\n'
-        thiseditor += '<person'
+# reinstate this after we have the proprocessor working on ORCID ids
+#        thiseditor += '<person'
+#        for editorattribute in editor:
+#            thisattribute = editorattribute
+#            thiseditor += ' ' + editorattribute + '="' + editor[editorattribute] + '"'
+#        thiseditor += '/>' + '\n'
+        thiseditor += '<personname>'
         for editorattribute in editor:
-            thisattribute = editorattribute
-            thiseditor += ' ' + editorattribute + '="' + editor[editorattribute] + '"'
-        thiseditor += '/>' + '\n'
+            thiseditor += editorattribute + ' ' + editor[editorattribute]
+        thiseditor += '</personname>' + '\n'
         ptxeditor += thiseditor
         ptxeditor += '</editor>' + '\n'
 
@@ -763,7 +779,7 @@ def mytransform_ptx_tag(txt, outertag, introtag, conclusiontag, innertags):
     # need to use the introtag.
     has_inner_tag = False
     for tag in innertags:
-        if "<" + tag + ">" in the_text: 
+        if "<" + tag + ">" in the_text:
             has_inner_tag = True
 
     if not has_inner_tag:
@@ -786,7 +802,7 @@ def mytransform_ptx_tag(txt, outertag, introtag, conclusiontag, innertags):
             the_env[tag] = re.sub(search_string, r"\2", the_text, 1, re.DOTALL)
             # and then remove it from the_text
             the_text = re.sub(search_string, r"\1\3", the_text, 1, re.DOTALL)
-        
+
     # presumably the only thing left in the_text is:
     # statement/intro/whatever goes first, then the selected tags, then the conclusion.
     innertags_re = "|".join(innertags)
@@ -1229,7 +1245,7 @@ def mytransform_fixptx(text):
     for lev, tag_of_lev in enumerate(tags):
       for tag in tag_of_lev:
         taglevel[tag] = lev
-        
+
 
 #    taglevel = {
 #        "chapter": 1,
@@ -1272,7 +1288,7 @@ def mytransform_fixptx(text):
       elif ch == ">":  # ended an openingn or closing tag
         if prevch == "/":   # self-closing tag
           if not inopeningtag:  # then pop the tag which was already saved
-#            print "removing self-closing tag", activetags, "thistag", thistag, "so far",theanswer[-50:] 
+#            print "removing self-closing tag", activetags, "thistag", thistag, "so far",theanswer[-50:]
             activetags.pop()
           else:
 #            print "tag so far", thistag, "activetags", activetags
@@ -1393,7 +1409,7 @@ def mytransform_ptx(text):
             if tag_name.startswith("o"): print("XXXXXXXXXXXXXXXXXXX  tag", tag)
             tag_name = re.sub(" .*","",tag_name)
             tag_name = re.sub(">$","",tag_name)
-            
+
             if tag_name not in component.generic_list:
                 component.generic_list.append(tag_name)
 
@@ -1971,8 +1987,8 @@ def mytransform_reprints(text):
 ###################
 
 def mytransform_raw(text):
-    
-    thetext = text      
+
+    thetext = text
 
     thetext = re.sub("&#39;", '"', thetext)
 
@@ -2093,7 +2109,7 @@ def old_mytransform_txt(text):
         these_authors = re.sub(",* and ", ", ", these_authors)
         these_authors = re.sub("[^a-zA-Z, .\-]", "", these_authors)
         author_list = these_authors.split(", ")
-        
+
         if this_workshop in papers_per_workshop:
         #    papers_per_workshop[this_workshop].append(author_list)
             authors_per_workshop[this_workshop] += author_list
@@ -2266,7 +2282,7 @@ def mytransform_tex_ptx(text):
     thetext = "\n" + re.sub(".*/", "", component.inputfilename) + "\n\n" + thetext
 
     thetext = re.sub(r"\\par", "</p>\n<p>", thetext, 1)
-    
+
     while "$" in thetext:
         thetext = re.sub("\$", "<m>", thetext, 1)
         thetext = re.sub("\$", "</m>", thetext, 1)
@@ -2388,7 +2404,7 @@ def myt_tex(txt):
                 print("ERR:", problem[:50])
         the_answer += r"\begin{problem}"
         if this_problem_type:
-            the_answer += r"(" + this_problem_type + ")" 
+            the_answer += r"(" + this_problem_type + ")"
         the_answer += "\n"
         the_answer += the_statement + "\n"
         the_answer += r"\end{problem}" + "\n\n"
@@ -2425,18 +2441,18 @@ def process_figure(txt):
 
     if the_xml_id.startswith("_"):
         the_xml_id = the_xml_id[1:]
-    
+
     # should be only one contained image
     if the_text.count("<image>") > 1:
         print("more than one contained image in fig_" + the_xml_id)
         the_text = process_fig_mult(the_text)
-        return "<figure" + the_text + "</figure>" 
+        return "<figure" + the_text + "</figure>"
 
 # should we skip this, because it was done in a previous iteration?
     # now put that id on the image
     the_text = re.sub("<image>",'<image xml:id="img_' + the_xml_id + '" >', the_text)
 
-    return "<figure" + the_text + "</figure>" 
+    return "<figure" + the_text + "</figure>"
 
 ##################
 
@@ -2460,8 +2476,8 @@ def process_fig_mult(text):
             pass
         new_text.append(part)
 
-    new_text = "START".join(new_text) 
-       
+    new_text = "START".join(new_text)
+
     return new_text
 
 ###################
@@ -2545,7 +2561,7 @@ def add_permid_within_sections(text):
 
     for tag in component.tags_by_level[0]:
 
-        if '<' + tag + ' ' not in thetext and '<' + tag + '>' not in thetext:  
+        if '<' + tag + ' ' not in thetext and '<' + tag + '>' not in thetext:
                  # space, because xml:id is required, but may be missing
             continue
 
@@ -2637,7 +2653,7 @@ def add_permid_within_sections(text):
 
 def add_permid_within(txt, parent_tag, level):
 
-    the_opening_tag = txt.group(1)   
+    the_opening_tag = txt.group(1)
     the_attributes = txt.group(2)
     the_text = txt.group(3)
     the_closing_tag = txt.group(4)
@@ -2770,4 +2786,35 @@ def add_permid_on(txt, tag, parent_permid=""):
 
     return "<" + tag + " " + permid_attribute + the_attribute + ">" + everything_else
 
-    
+###############
+
+def texmathtopretext(text):
+
+    thetext=text
+
+    thetext = re.sub(r"(\$)(.*?)(\$)", texmathtoptx,thetext,0,re.DOTALL)
+    thetext = re.sub(r"(\\\[)(.*?)(\\\])", texmathtoptx,thetext,0,re.DOTALL)
+
+    return(thetext)
+
+#---------------
+
+def texmathtoptx(txt):
+
+    mathmarker = txt.group(1)
+    thetext = txt.group(2)
+
+    if mathmarker == "$":
+        mathtag = "m"
+    elif mathmarker == "\\[":
+        mathtag = "men"
+
+    if "<" in thetext:
+        print("found a less than", thetext)
+
+    thetext = re.sub(r"< *", r"\\lt ", thetext)
+    thetext = re.sub(r"> *", r"\\gt ", thetext)
+
+    return "<" + mathtag + ">" + thetext + "</" + mathtag + ">"
+
+

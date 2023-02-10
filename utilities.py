@@ -274,7 +274,7 @@ def sha1hide(txt, tag, keeptags=False):
         return "ACOMMB" + the_hash + "ENDZ"
     else:
         return "A" + tag + "B" + the_hash + "ENDZ"
-        
+
 #################
 
 def sha1undigest(txt):
@@ -543,9 +543,9 @@ def argument_of_macro(text,mac,argnum=1):
 #################
 
 def magic_character_convert(text, mode):
-    """ replace & and < by 
-        &amp; or \amp or <ampersand/> or TMPAMPAMP 
-            and 
+    """ replace & and < by
+        &amp; or \amp or <ampersand/> or TMPAMPAMP
+            and
         &lt; or \lt or <less/> or TMPLESSLESS
             depending on whether mode is
         code or math or text or hide
@@ -570,7 +570,7 @@ def magic_character_convert(text, mode):
     elif mode == "text":
         the_text = re.sub("TMPhideAMPAMP", r"&amp;", the_text)
         the_text = re.sub("TMPhideLESSLESS", r"&lt;", the_text)
-        
+
 # also need an "unhide" mode
 
     return the_text
@@ -623,7 +623,7 @@ def tag_to_numbered_t(tag, txt):
     else:
         this_N = component.lipcounter[the_tag]
         component.lipcounter[the_tag] += 1
-        
+
         return the_start1 + str(this_N) + the_start2  + the_text + the_end + str(this_N) + ">"
 
 #############
@@ -650,7 +650,7 @@ def delete_leading_block(text):
         the_answer = re.sub("\n {" + str(min_leading_space) + "}", "\n" + " "*12, the_text)
     else:
         the_answer = the_text
-    
+
     return the_answer
 
 #############
@@ -949,7 +949,7 @@ def to_semantic_ma(text):
     thetext = re.sub(r"(\\text{)([^{}]+)}",
                      to_paren_group, thetext, 0, re.DOTALL)
 
-    # intervals 
+    # intervals
     thetext = re.sub(r"\[ *([0-9\.a-zA-Z\-+\\_{}]+) *, *([0-9\.a-zA-Z\-+\\_{}]+) *\]",
                      r"\\ccInterval{\1}{\2}", thetext)
     thetext = re.sub(r"\( *([0-9\.a-zA-Z\-+\\_{}]+) *, *([0-9\.a-zA-Z\-+\\_{}]+) *\]",
@@ -1071,7 +1071,7 @@ def to_semantic_ma(text):
         timesmeans = "cartesianProduct"
     else:
         timesmeans = "explicitMultiplication"
-    
+
         #  multiplication with a times (note that this is just for calculus)
     thetext = re.sub(r"([0-9\.]+) *(\\times) *([0-9\.]+)( |$)",
                      r"\\" + timesmeans + r"{\1}{\2}{\3}\4", thetext)
@@ -1248,7 +1248,7 @@ def to_semantic_integral(txt):
         else:  # in tex, one character lower limit
             upperlimit = "{" + theintegrand[0] + "}"
             theintegrand = theintegrand[1:]
-    
+
 
     theintegrand = theintegrand.strip()
     # remove the spacing before dx in the source
@@ -1311,11 +1311,11 @@ def business_card(c_location, size, scale, contents, colors):
     edge_width = size[4]
 
     enclosing_rectangle = '<path d="'
-    enclosing_rectangle += 'M ' + left_x_str + ' ' + top_y_str + ' ' 
-    enclosing_rectangle += 'L ' + left_x_str + ' ' + bottom_y_str + ' ' 
-    enclosing_rectangle += 'L ' + right_x_str + ' ' + bottom_y_str + ' ' 
-    enclosing_rectangle += 'L ' + right_x_str + ' ' + top_y_str + ' ' 
-    enclosing_rectangle += 'L ' + left_x_str + ' ' + top_y_str + ' ' 
+    enclosing_rectangle += 'M ' + left_x_str + ' ' + top_y_str + ' '
+    enclosing_rectangle += 'L ' + left_x_str + ' ' + bottom_y_str + ' '
+    enclosing_rectangle += 'L ' + right_x_str + ' ' + bottom_y_str + ' '
+    enclosing_rectangle += 'L ' + right_x_str + ' ' + top_y_str + ' '
+    enclosing_rectangle += 'L ' + left_x_str + ' ' + top_y_str + ' '
     enclosing_rectangle += '" '
 
     enclosing_rectangle += 'stroke="' + border_color + '" '
@@ -1428,3 +1428,11 @@ def business_card(c_location, size, scale, contents, colors):
 
 
     return [the_object, [center_x, center_y], [left_x, right_x, top_y, bottom_y], aspect_ratio]
+
+################
+
+standardmacros = r"\newcomand{\R}{\mathbb R}" + "\n"\
+    r"\newcomand{\C}{\mathbb C}" + "\n"\
+    r"\newcomand{\N}{\mathbb N}" + "\n"\
+    r"\newcomand{\Z}{\mathbb Z}" + "\n"\
+    r"\newcomand{\Q}{\mathbb Q}"
