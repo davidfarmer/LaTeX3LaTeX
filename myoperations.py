@@ -501,11 +501,11 @@ def outputprob(prob):
         theproblem += '</originator>\n'
 
     if 'introduction' in prob and prob['introduction'].strip():
-        theproblem += '<introduction>\n'
+#        theproblem += '<introduction>\n'
         theproblem += '\n<p>\n'
         theproblem += prob['introduction']
         theproblem += '\n</p>\n'
-        theproblem += '\n</introduction>\n'
+#        theproblem += '\n</introduction>\n'
 
     theproblem += '<statement>\n'
     theproblem += '<p>\n'
