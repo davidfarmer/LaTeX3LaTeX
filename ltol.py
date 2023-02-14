@@ -20,7 +20,7 @@ import myoperations
 # input and output files.
 #################################
 
-conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mbx_strict_tex", "mbx_strict_html", "mbx_fa", "ptx_transform",
+conversion_options = ["xml", "ptx_pp", "xml_pp", "ptx_fix", "ptx_transform",
                       "txt",
                       "raw",
                       "probhtml",
@@ -35,7 +35,7 @@ conversion_options = ["xml", "mbx", "ptx_pp", "xml_pp", "mbx_pp", "ptx_fix", "mb
                       "alice", "lmfdb",
                       "html_matrix",
                       "xml_semantic", "ptx_semantic", "html_semantic",
-                      "mbx_permid", "xml_permid", "ptx_permid",
+                      "xml_permid", "ptx_permid",
                       "tex", "tex_ptx",
                       "html"]
 
@@ -94,11 +94,8 @@ if component.inputname == component.outputname:
     print("try again")
     sys.exit()
 
-if component.filetype_plus in ["ptx", "ptx_pp", "ptx_permid", "ptx_fix", "ptx_semantic", "mbx_strict_tex", "mbx_strict_html", "mbx_fa", "fixptx"]:
+if component.filetype_plus in ["ptx", "ptx_pp", "ptx_permid", "ptx_fix", "ptx_semantic", "fixptx"]:
     fileextension_in = "ptx"
-    fileextension_out = "ptx"
-elif component.filetype_plus in ["mbx_pp"]:
-    fileextension_in = "mbx"
     fileextension_out = "ptx"
 elif component.filetype_plus in ["html_pp"]:
     fileextension_in = "html"
@@ -145,9 +142,6 @@ elif component.filetype_plus in ["reprints"]:
 elif component.filetype_plus in ["iso"]:
     fileextension_in = "iso"
     fileextension_out = "html"
-elif component.filetype_plus in ["mbx_permid"]:
-    fileextension_in = "mbx"
-    fileextension_out = "ptx"
 else:
     fileextension_in = component.filetype_plus
     fileextension_out = component.filetype_plus
@@ -222,7 +216,7 @@ else:
 listofpermids = []
 
 # if adding permids, need to find old permids
-if component.filetype_plus in ['mbx_permid', 'ptx_permid', 'xml_permid']:
+if component.filetype_plus in ['ptx_permid', 'xml_permid']:
     for inputfile, outputfile in component.iofilepairs:
         with open(inputfile) as infile:
             thisfile = infile.read()
@@ -268,10 +262,8 @@ for inputfile, outputfile in component.iofilepairs:
 
 #    myoperations.setvariables(component.onefile)
 
-    if component.filetype_plus in ['mbx_permid', 'ptx_permid', 'xml_permid']:
+    if component.filetype_plus in ['ptx_permid', 'xml_permid']:
         component.onefile = myoperations.add_permid_within_sections(component.onefile)
-        if component.filetype_plus == 'mbx_permid':  # because we are changing file extensions
-            component.onefile = re.sub("\.mbx", ".ptx", component.onefile)
     if component.filetype_plus == 'tex':
         component.onefile = myoperations.mytransform_tex(component.onefile)
     if component.filetype_plus == 'tex_ptx':
@@ -310,15 +302,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_reprints(component.onefile)
     elif component.filetype_plus in ['iso']:
         component.onefile = myoperations.mytransform_iso(component.onefile)
-    elif component.filetype_plus in ['mbx', 'xml']:
-        component.onefile = myoperations.mytransform_mbx(component.onefile)
 
-    if component.filetype_plus in ['mbx_pp', 'ptx_pp', 'xml_pp', 'tex_ptx']:
-
-        if component.filetype_plus in ['mbx_pp']:
-            component.onefile = re.sub(r'\.mbx"', '.ptx"', component.onefile)
-
-    if component.filetype_plus in ['mbx_pp', 'ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx']:
+    if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx']:
 
         component.onefile = myoperations.mytransform_ptx_remove_linefeeds(component.onefile)
 
@@ -392,19 +377,8 @@ for inputfile, outputfile in component.iofilepairs:
                                    "\n\n\n" + r"\2" + "\n" + r"\1" + r"\3", component.onefile)
         component.onefile = re.sub(r'type="labelalph"', 'label="(a)"', component.onefile)
 
-    if component.filetype_plus in ["ptx_fix", "mbx_strict_tex", "mbx_strict_html"]:
-        component.onefile = myoperations.mbx_fix(component.onefile)
-
-    if component.filetype_plus in ["mbx_strict_tex", "mbx_strict_html"]:
-        component.onefile = transforms.mbx_strict(component.onefile)
-
-    if component.filetype_plus == "mbx_strict_tex":
-        component.onefile = transforms.mbx_strict_tex(component.onefile)
-    elif component.filetype_plus == "mbx_strict_html":
-        component.onefile = transforms.mbx_strict_html(component.onefile)
-
-    if component.filetype_plus == "mbx_fa":
-        component.onefile = transforms.mbx_fa(component.onefile)
+    if component.filetype_plus in ["ptx_fix"]:
+        component.onefile = myoperations.ptx_fix(component.onefile)
 
     if "ptx" in component.filetype_plus:
         # there is not actually a subtask tag
@@ -444,7 +418,7 @@ if component.filetype_plus == "ldata":
         for lam1lam2 in component.foundvalues:
             outfile.write(lam1lam2 + ",\n")
 
-if component.filetype_plus in ['mbx_permid', 'ptx_permid', 'xml_permid'] and component.all_permid:
+if component.filetype_plus in ['ptx_permid', 'xml_permid'] and component.all_permid:
     component.all_permid.sort()
 #    with open(outputdir + 'allpermid.txt', 'w') as f:
 #        for permid in component.all_permid:

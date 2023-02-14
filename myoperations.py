@@ -16,7 +16,6 @@ def setvariables(text):
 
 def fa_convert(txt):
 
-# todo:  line 425 of sec_chainrule.mbx:
 #        <mrow>\lz{y}{x} \amp = y'(u) \cdot u'(x)\amp\amp \text{XCXVXBXN(since } y=\fa{f}{u} \text{ and }u=\fa{g}{x}</mrow>
 #  does <static>5\sec^2(5x)</static> count as math mode?
 # \sum a_n(x-c)^n
