@@ -324,7 +324,7 @@ for inputfile, outputfile in component.iofilepairs:
 
         component.onefile = transforms.ptx_pp(component.onefile)
 
-        component.onefile = myoperations.mytransform_mbx_linefeeds(component.onefile)
+        component.onefile = myoperations.mytransform_ptx_linefeeds(component.onefile)
 
             # if the number of columns is more than 6, set it to 6
             #  (should only occur as an artifact of an imperfect LaTeX conversion
