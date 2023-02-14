@@ -500,12 +500,12 @@ def outputprob(prob):
         theproblem += '<personname>' + prob['originator'] + '</personname>'
         theproblem += '</originator>\n'
 
-    if 'introduction' in prob and prob['introduction'].strip():
-#        theproblem += '<introduction>\n'
+    if 'prelude' in prob and prob['prelude'].strip():
+        theproblem += '<prelude>\n'
         theproblem += '\n<p>\n'
-        theproblem += prob['introduction']
+        theproblem += prob['prelude']
         theproblem += '\n</p>\n'
-#        theproblem += '\n</introduction>\n'
+        theproblem += '\n</prelude>\n'
 
     theproblem += '<statement>\n'
     theproblem += '<p>\n'
@@ -560,12 +560,13 @@ def parseprob(text):
     thestatement = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)[0]
     theproblem["statement"] = thestatement
 
+# introductin to a problem in old AimPL is "prelude" in ptx
     theintro = ""
     if 'div class="intro"' in thetext:
         theintro = re.findall(r'<div class="intro">(.*?)</div>', thetext, re.DOTALL)[0]
         theintro = re.sub("&nbsp;", "", theintro)
-   #     print("found an introduction:", theintro)
-    theproblem["introduction"] = theintro
+   #     print("found an prelude:", theintro)
+    theproblem["prelude"] = theintro
 
     remarks = []
     thestatus = {}
@@ -625,6 +626,9 @@ def mytransform_probhtmlmain(text):
 
     docinfo += '<document-id>' + documentid + '</document-id>' + '\n'
     docinfo += '<macros>' + '\n' + themacros + '\n' + '</macros>' + '\n'
+
+    docinfo += '<rename element="openproblem">Problem</rename>' + '\n'
+    docinfo += '<rename element="openquestion">Question</rename>' + '\n'
 
     docinfo += '</docinfo>' + '\n'
 

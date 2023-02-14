@@ -1431,8 +1431,8 @@ def business_card(c_location, size, scale, contents, colors):
 
 ################
 
-standardmacros = r"\newcomand{\R}{\mathbb R}" + "\n"\
-    r"\newcomand{\C}{\mathbb C}" + "\n"\
-    r"\newcomand{\N}{\mathbb N}" + "\n"\
-    r"\newcomand{\Z}{\mathbb Z}" + "\n"\
-    r"\newcomand{\Q}{\mathbb Q}"
+standardmacros = r"\newcommand{\R}{\mathbb R}" + "\n"\
+    r"\newcommand{\C}{\mathbb C}" + "\n"\
+    r"\newcommand{\N}{\mathbb N}" + "\n"\
+    r"\newcommand{\Z}{\mathbb Z}" + "\n"\
+    r"\newcommand{\Q}{\mathbb Q}"
