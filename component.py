@@ -31,6 +31,7 @@ topic = "combinatorics"
 topic = "calculus_single"
 
 aimplid = "AA"
+aimpltagofnumber = {}
 
 foundvalues = []
 startagain = ""

@@ -455,7 +455,7 @@ def mytransform_probhtmlsection(text):
     for prob in theproblems:
        parsedproblems.append(parseprob(prob))
 
-    theproblemstatements = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)
+#    theproblemstatements = re.findall(r'<span class="probbody">(.*?)</span>', thetext, re.DOTALL)
     print("number of theproblems", len(theproblems))
     for prob in parsedproblems:
         print(prob)
@@ -487,7 +487,10 @@ def outputprob(prob):
     thetag = "openquestion"
     if "?" not in prob['statement']: thetag="openproblem"
 
-    theproblem = '<' + thetag + '>\n'
+    theproblem = '<' + thetag
+    if 'number' in prob and prob['number'].strip():
+        theproblem += ' xml:id="' + component.aimplid + utilities.numbertostring(prob['number']) + '"'
+    theproblem += '>\n'
 
     if 'title' in prob and prob['title'].strip():
         theproblem += '<title>'
@@ -547,6 +550,14 @@ def parseprob(text):
     theproblem = {}
 #    print("==============")
 #    print(thetext)
+
+    # hack to add xref to problems
+#    thetext = re.sub(r"Problem +(\d+\.\d+)", r'<xref ref="' + component.aimplid + utilities.numbertostring("\1") + '"/>', thetext)
+    thetext = re.sub(r"Problem +(\d+\.\d+)", utilities.ptxxref, thetext)
+
+    thenumber = re.findall('<span class="number">(.*?)</span>',thetext)[0]
+    theproblem["number"] = thenumber
+
     thetitle = ""
     if '<h3 style="font-weight: bold; font-style: normal">' in thetext:
         thetitle = re.findall('<h3 style="font-weight: bold; font-style: normal">(.*?)</h3>',thetext)[0]

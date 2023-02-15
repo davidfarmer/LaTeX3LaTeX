@@ -672,6 +672,31 @@ def two_letter_number(num):
 
 ##############
 
+def ptxxref(txt):
+
+    theoldtag = txt.group(1)
+    ans = '<xref ref="' + component.aimplid + numbertostring(theoldtag) + '"/>'
+
+    return ans
+
+def numbertostring(string):
+
+    ans = ""
+    base = 52
+    for i, char in enumerate(string):
+        this_num = ord(char)
+        print("char", char, "ord(char)", ord(char) , "zz", chr(base + ord(char)))
+        num_normalized = base + this_num
+#        if this_num >= 97:
+#            num_normalized = this_num - 97
+#        else:
+#            num_normalized = this_num # - 65
+        ans += chr(num_normalized)   
+
+    return ans
+
+##############
+
 def frombase52(string):
 
     string_backward = string[::-1]
