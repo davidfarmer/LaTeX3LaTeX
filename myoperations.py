@@ -2205,6 +2205,12 @@ def mytransform_aimplstructure(text):
 
     thetext = text
 
+    thetext = re.sub("\s*<title>\([ivx0-9]+\)</title>\s*", "",thetext)
+    thetext = re.sub("<li>\s*<p>", "<li>", thetext)
+    thetext = re.sub("</p>\s*</li>", "</li>", thetext)
+    thetext = re.sub("<remark>", "", thetext)
+    thetext = re.sub("</remark>", "", thetext)
+
     thetext = re.sub('<(problem|question|conjecture)', r'<open\1', thetext)
     thetext = re.sub('</(problem|question|conjecture)>', r'</open\1>', thetext)
 
@@ -2217,11 +2223,12 @@ def mytransform_aimplstructure(text):
     thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
     thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
     thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
 
     # now "unstack" the same discxussion types
     for tag in ["discussion", "context", "suggestion", "opinion", "status"]:
          thetext = re.sub(r"</" + tag + ">\s*<" + tag + ">",
-             "</p>" + "\n" + "<p>", thetext)   
+              "\n\n", thetext)
 
     return thetext
 ###################
@@ -2250,21 +2257,26 @@ def aimpl_moveinsideafter(txt):
     theproblemtype = txt.group(1)
     thediscussion = txt.group(2)
 
-    disussiontag = "discussion"
+    if thediscussion.count("<p>") > 1:
+        theanswer = "</open" + theproblemtype + ">" + "\n"
+        theanswer += thediscussion + "\n"
 
-    if any(" " + wrd in thediscussion for wrd in component.aimplcontextwords):
+    else:
+      disussiontag = "discussion"
+
+      if any(" " + wrd in thediscussion for wrd in component.aimplcontextwords):
         disussiontag = "context"
-    elif any(" " + wrd in thediscussion for wrd in component.aimplsuggestionwords):
+      elif any(" " + wrd in thediscussion for wrd in component.aimplsuggestionwords):
         disussiontag = "suggestion"
-    elif any(" " + wrd in thediscussion for wrd in component.aimplopinionwords):
+      elif any(" " + wrd in thediscussion for wrd in component.aimplopinionwords):
         disussiontag = "opinion"
-    elif any(" " + wrd in thediscussion for wrd in component.aimplstatuswords):
+      elif any(" " + wrd in thediscussion for wrd in component.aimplstatuswords):
         disussiontag = "status"
 
-    theanswer = "<" + disussiontag + ">" + "\n"
-    theanswer += thediscussion + "\n"
-    theanswer += "</" + disussiontag + ">" + "\n"
-    theanswer += "</open" + theproblemtype + ">" + "\n"
+      theanswer = "<" + disussiontag + ">" + "\n"
+      theanswer += thediscussion + "\n"
+      theanswer += "</" + disussiontag + ">" + "\n"
+      theanswer += "</open" + theproblemtype + ">" + "\n"
 
     return theanswer
 
