@@ -31,6 +31,7 @@ conversion_options = ["xml", "ptx_pp", "xml_pp", "ptx_fix", "ptx_transform",
                       "ldata",
                       "reprints",
                       "html_ptx",
+                      "aimplstructure",
                       "html_pp",
                       "alice", "lmfdb",
                       "html_matrix",
@@ -120,6 +121,9 @@ elif component.filetype_plus in ["tex_ptx"]:
     fileextension_out = "ptx"
 elif component.filetype_plus in ["html_ptx"]:
     fileextension_in = "html"
+    fileextension_out = "ptx"
+elif component.filetype_plus in ["aimplstructure"]:
+    fileextension_in = "ptx"
     fileextension_out = "ptx"
 elif component.filetype_plus in ["html_matrix"]:
     fileextension_in = "html"
@@ -270,6 +274,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_tex_ptx(component.onefile)
     if component.filetype_plus == 'html_ptx':
         component.onefile = myoperations.mytransform_html_ptx(component.onefile)
+    if component.filetype_plus == 'aimplstructure':
+        component.onefile = myoperations.mytransform_aimplstructure(component.onefile)
     if component.filetype_plus == 'fixptx':
         component.onefile = myoperations.mytransform_fixptx(component.onefile)
     if component.filetype_plus == 'html_matrix':
@@ -303,7 +309,7 @@ for inputfile, outputfile in component.iofilepairs:
     elif component.filetype_plus in ['iso']:
         component.onefile = myoperations.mytransform_iso(component.onefile)
 
-    if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx']:
+    if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
 
         component.onefile = myoperations.mytransform_ptx_remove_linefeeds(component.onefile)
 

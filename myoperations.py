@@ -2201,6 +2201,74 @@ def mytransform_html_matrix(text):
 
 ###################
 
+def mytransform_aimplstructure(text):
+
+    thetext = text
+
+    thetext = re.sub('<(problem|question|conjecture)', r'<open\1', thetext)
+    thetext = re.sub('</(problem|question|conjecture)>', r'</open\1>', thetext)
+
+    # this is not good because it most of the time it just puts it back as it was
+    thetext = re.sub(r"<p>(.*?)\s*</p>\s*<([^<>]*>)", aimpl_moveinsidebefore, thetext, 0, re.DOTALL)
+
+    # try to move discussion inside the openproblem/quesiton/etc
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
+
+    # now "unstack" the same discxussion types
+    for tag in ["discussion", "context", "suggestion", "opinion", "status"]:
+         thetext = re.sub(r"</" + tag + ">\s*<" + tag + ">",
+             "</p>" + "\n" + "<p>", thetext)   
+
+    return thetext
+###################
+
+def aimpl_moveinsidebefore(txt):
+
+    possiblepreamble = txt.group(1)
+    thenexttag = txt.group(2)
+
+    if "It is natural" in possiblepreamble:
+       print("found preamble", possiblepreamble)
+
+    if possiblepreamble.endswith( (":", ",") ) and thenexttag.startswith("open"):
+       theanswer = "<" + thenexttag
+       theanswer += "<preamble>" + "\n" + "<p>" + "\n"
+       theanswer += possiblepreamble
+       theanswer += "</p>" + "\n" + "</preamble>" + "\n"
+    else:
+       theanswer = "<p>" + "\n" + possiblepreamble + "\n" + "</p>"
+       theanswer += "<" + thenexttag
+
+    return theanswer
+
+def aimpl_moveinsideafter(txt):
+
+    theproblemtype = txt.group(1)
+    thediscussion = txt.group(2)
+
+    disussiontag = "discussion"
+
+    if any(" " + wrd in thediscussion for wrd in component.aimplcontextwords):
+        disussiontag = "context"
+    elif any(" " + wrd in thediscussion for wrd in component.aimplsuggestionwords):
+        disussiontag = "suggestion"
+    elif any(" " + wrd in thediscussion for wrd in component.aimplopinionwords):
+        disussiontag = "opinion"
+    elif any(" " + wrd in thediscussion for wrd in component.aimplstatuswords):
+        disussiontag = "status"
+
+    theanswer = "<" + disussiontag + ">" + "\n"
+    theanswer += thediscussion + "\n"
+    theanswer += "</" + disussiontag + ">" + "\n"
+    theanswer += "</open" + theproblemtype + ">" + "\n"
+
+    return theanswer
+
+###################
 def mytransform_html_ptx(text):
 
     thetext = text

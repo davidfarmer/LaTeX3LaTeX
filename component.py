@@ -32,6 +32,11 @@ topic = "calculus_single"
 
 aimplid = "AA"
 aimpltagofnumber = {}
+aimplcontextwords = ["support", "agree", "agree", "contradict", "answer",
+                     "more difficult"]
+aimplsuggestionwords = ["example", "try"]
+aimplopinionwords = ["opinion", "think", "easy", "difficult"]
+aimplstatuswords = ["solved", "shown", "known", "counterexample"]
 
 foundvalues = []
 startagain = ""
@@ -85,7 +90,7 @@ document_environments = ['proof',
                          'corollary', 'principle', 'algorithm',
                          'definition', 'axiom', 'example', 'insight', 'exploration',
                          'problem', 'exercise', 'question', 'note', 'blockquote',
-                         'openproblem', 'openquestion',
+                         'openconjecture', 'openproblem', 'openquestion',
                          'activity', 'remark', 'warning', 'table', 'tabular',
                          'list', 'listing', 'program', 'console', 'demonstration',
                          'images', 'image',
@@ -95,9 +100,10 @@ document_environments = ['proof',
 
 document_components = ['exercises', 'exercisegroup', 'row', 'reading-questions',
                        'webwork', 'instruction', 'instructions',
+                       'preamble',
                        'statement', 'solution', 'answer', 'hint', 'case', 'aside',
                        'interactive', 'static', 'investigation',
-                       'commentary', 'status', 'context', 'suggestion', 'opinion',
+                       'discussion', 'status', 'context', 'suggestion', 'opinion',
                        'quantity',
                        'webwork', 'setup']
 
