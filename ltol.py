@@ -22,6 +22,7 @@ import myoperations
 
 conversion_options = ["xml", "ptx_pp", "xml_pp", "ptx_fix", "ptx_transform",
                       "txt",
+                      "bibliotxt",
                       "raw",
                       "probhtml",
                       "svg",
@@ -118,6 +119,9 @@ elif component.filetype_plus in ["xml", "xml_pp", "xml_permid", "xml_semantic"]:
     fileextension_out = "xml"
 elif component.filetype_plus in ["tex_ptx"]:
     fileextension_in = "tex"
+    fileextension_out = "ptx"
+elif component.filetype_plus in ["bibliotxt"]:
+    fileextension_in = "bbl"
     fileextension_out = "ptx"
 elif component.filetype_plus in ["html_ptx"]:
     fileextension_in = "html"
@@ -284,6 +288,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_to_semantic(component.onefile)
     elif component.filetype_plus == 'txt':
         component.onefile = myoperations.mytransform_txt(component.onefile)
+    elif component.filetype_plus == 'bibliotxt':
+        component.onefile = myoperations.mytransform_bibliotxt(component.onefile)
     elif component.filetype_plus == 'raw':
         component.onefile = myoperations.mytransform_raw(component.onefile)
     elif component.filetype_plus == 'html':

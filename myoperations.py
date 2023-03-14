@@ -2040,6 +2040,16 @@ def mytransform_txt(text):
             mytransform_biblio, thetext, 0, re.DOTALL)
     return thetext
 
+def mytransform_bibliotxt(text):
+
+    thetext = text
+
+    
+
+    thetext = re.sub(r"(<biblio [^>]+>)(.*?)(</biblio>)",
+            mytransform_biblio, thetext, 0, re.DOTALL)
+    return thetext
+
 def mytransform_biblio(txt):
     start_tag = txt.group(1)
     bib_content = txt.group(2)
@@ -2214,8 +2224,13 @@ def mytransform_aimplstructure(text):
     thetext = re.sub('<(problem|question|conjecture)', r'<open\1', thetext)
     thetext = re.sub('</(problem|question|conjecture)>', r'</open\1>', thetext)
 
-    # this is not good because it most of the time it just puts it back as it was
+#    # this is not good because it most of the time it just puts it back as it was
+#    thetext = re.sub(r"<p>(.*?)\s*</p>\s*(?=<open)", r"<ppr>\1</ppr>", thetext, 0, re.DOTALL)
+
     thetext = re.sub(r"<p>(.*?)\s*</p>\s*<([^<>]*>)", aimpl_moveinsidebefore, thetext, 0, re.DOTALL)
+    thetext = re.sub(r"<p>([^<>]*?)\s*</p>\s*<(open[^<>]*>)", aimpl_moveinsidebefore, thetext, 0, re.DOTALL)
+
+#    thetext = re.sub(r"<p>(((?!<p>).)*)</p>\s*<(open[^<>]*>)", aimpl_moveinsidebefore, thetext, 0, re.DOTALL)
 
     # try to move discussion inside the openproblem/quesiton/etc
     thetext = re.sub(r"</open(problem|question|conjecture)>\s*(<p>.*?</p>)", aimpl_moveinsideafter, thetext, 0, re.DOTALL)
@@ -2230,24 +2245,28 @@ def mytransform_aimplstructure(text):
          thetext = re.sub(r"</" + tag + ">\s*<" + tag + ">",
               "\n\n", thetext)
 
+#    thetext = utilities.tex_to_html_alphabets(thetext)
+
     return thetext
 ###################
 
 def aimpl_moveinsidebefore(txt):
 
-    possiblepreamble = txt.group(1)
+    possibleprelude = txt.group(1).strip()
     thenexttag = txt.group(2)
 
-    if "It is natural" in possiblepreamble:
-       print("found preamble", possiblepreamble)
+    if "following" in possibleprelude and "simplest" in possibleprelude:
+       print("found poss", thenexttag, "prelude", possibleprelude)
 
-    if possiblepreamble.endswith( (":", ",") ) and thenexttag.startswith("open"):
+    if thenexttag.startswith("open") and (
+        (not possibleprelude.endswith( (".", "!", "?", ">") ) ) or ("following" in possibleprelude) ):
+       print("    yes, really found a prelude")
        theanswer = "<" + thenexttag
-       theanswer += "<preamble>" + "\n" + "<p>" + "\n"
-       theanswer += possiblepreamble
-       theanswer += "</p>" + "\n" + "</preamble>" + "\n"
+       theanswer += "<prelude>" + "\n" + "<p>" + "\n"
+       theanswer += possibleprelude
+       theanswer += "</p>" + "\n" + "</prelude>" + "\n"
     else:
-       theanswer = "<p>" + "\n" + possiblepreamble + "\n" + "</p>"
+       theanswer = "<p>" + "\n" + possibleprelude + "\n" + "</p>"
        theanswer += "<" + thenexttag
 
     return theanswer
@@ -2264,14 +2283,15 @@ def aimpl_moveinsideafter(txt):
     else:
       disussiontag = "discussion"
 
-      if any(" " + wrd in thediscussion for wrd in component.aimplcontextwords):
+      if any(" " + wrd in thediscussion for wrd in component.aimplstatuswords):
+          if not any(" " + wrd in thediscussion for wrd in component.aimplnonstatuswords):
+            disussiontag = "status"
+      elif any(" " + wrd in thediscussion for wrd in component.aimplcontextwords):
         disussiontag = "context"
       elif any(" " + wrd in thediscussion for wrd in component.aimplsuggestionwords):
         disussiontag = "suggestion"
       elif any(" " + wrd in thediscussion for wrd in component.aimplopinionwords):
         disussiontag = "opinion"
-      elif any(" " + wrd in thediscussion for wrd in component.aimplstatuswords):
-        disussiontag = "status"
 
       theanswer = "<" + disussiontag + ">" + "\n"
       theanswer += thediscussion + "\n"

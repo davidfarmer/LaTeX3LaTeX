@@ -32,11 +32,12 @@ topic = "calculus_single"
 
 aimplid = "AA"
 aimpltagofnumber = {}
-aimplcontextwords = ["support", "agree", "contradict", "answer",
+aimplcontextwords = ["support", "agree", "contradict",
                      "more difficult"]
 aimplsuggestionwords = ["example", "try"]
 aimplopinionwords = ["opinion", "think", "easy", "difficult"]
-aimplstatuswords = ["solved", "shown", "known ", "counterexample", "progress"]
+aimplstatuswords = ["solved", "shown", "proven", "proved", "known ", "answer", "counterexample", "progress"]
+aimplnonstatuswords = ["expected"]
 
 foundvalues = []
 startagain = ""

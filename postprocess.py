@@ -201,6 +201,8 @@ def add_line_fe(txt):
 #    print "22222222222222222222", the_tag
 #    print re.sub("Practice visualizing vector addition", "Practice visualizing vector44addition", the_text)
 
+# Beezer says that in some ways idx on separate lines are bad
+# so maybe do this only when helpful
     for _ in range(10):
     # put each idx on its own line
         the_text = re.sub(the_space + r"\s*" + "(<idx>.*?</idx>)\s*(<idx>)", the_space + "    " + r"\1" + the_space + "    " + r"\2", the_text)
@@ -303,6 +305,12 @@ def add_line_fe(txt):
 
     # idx at end of paragraph has two extra spaces
     the_text = re.sub("</idx>" + the_space + "$", "</idx>" + the_space[:-1*component.indent_num], the_text)
+
+#    # now we change our mind and go back and smash all the idx together.
+#    the_text = re.sub("(</idx>)\s+(<idx)", r"$1$2", the_text)
+#    the_text = re.sub("(\S)\s*(<idx)", r"$1$2", the_text)
+
+
 
 #    print "8888888888888888", the_tag
 #    print re.sub("being the other option", "being the other3option", the_text)
