@@ -219,6 +219,9 @@ tex_to_html_characters = [
     [r"{\\ss}",'&#223;'],
     [r"\\ss ",'&#223;'],
     [r"\\ss\b",'&#223;'],
+    [r"{\\SS}",'&#223;'],
+    [r"\\SS ",'&#223;'],
+    [r"\\SS\b",'&#223;'],
 
     [r"\{\\cprime *\}",r"'"],
     [r"\\cprime ",r"'"],
@@ -687,7 +690,7 @@ def numbertostring(string):
     base = 52
     for i, char in enumerate(string):
         this_num = ord(char)
-        print("char", char, "ord(char)", ord(char) , "zz", chr(base + ord(char)))
+#        print("char", char, "ord(char)", ord(char) , "zz", chr(base + ord(char)))
         num_normalized = base + this_num
 #        if this_num >= 97:
 #            num_normalized = this_num - 97

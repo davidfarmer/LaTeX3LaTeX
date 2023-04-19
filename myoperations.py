@@ -1906,9 +1906,11 @@ def mytransform_reprints(text):
     theanswer = ""
     thehead = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>AIM reprints</h1>'
 
-    thehead = "<style>.subpage > * { margin-left: auto; margin-right: auto; padding-left: 50px; padding-right: 60px; max-width: 600px; } .subpage { margin-bottom: 50px; } .newyear { margin-top: 2ex; margin-bottom: 0.5ex; font-size: 200%; } .onepaper { margin-bottom: 1.5ex; } .papertitle { text-decoration: none; font-size: 110%; } .papertitle:hover { background: #eee; } .pub { margin-left: 2em; font-style: italic; }</style>"
+    thehead = "<!-- ./ltol.py AIM_Reprints_ALL_April_18_2023.txt path_to_outputfile. \n Then put as publishedpapers.txt in main WordPress directory --> \n " + "<style>.subpage > * { margin-left: auto; margin-right: auto; padding-left: 50px; padding-right: 60px; max-width: 600px; } .subpage { margin-bottom: 50px; } .newyear { margin-top: 2ex; margin-bottom: 0.5ex; font-size: 200%; } .onepaper { margin-bottom: 1.5ex; position: relative} .papertitle { text-decoration: none; font-size: 110%; } .papertitle:hover { background: #eee; } .pub { margin-left: 2em; font-style: italic; } .number { position: absolute; left: -0.6em; display: none; } .onepaper:hover .number { display: inline; } </style>"
 
     thehead += "<dvi class='subpage'>"
+
+    yearcount = {}
 
     for ct, entry in enumerate(theentries):
         theselines = entry.splitlines()
@@ -1958,6 +1960,7 @@ def mytransform_reprints(text):
             formatted_authors = "<div class='paperauthors'>" + authors_nameorder + "</div>\n"
 
             formatted_entry = "\n<div class='onepaper'>\n"
+            formatted_entry += "<span class='number'>" + "yearplaceholder" + "-" + "counterplaceholder" + "</span>"
             formatted_entry += formatted_title
             formatted_entry += formatted_authors
             formatted_entry += "<div class='pub'>"+this_pub+"</div>"
@@ -1965,29 +1968,40 @@ def mytransform_reprints(text):
 
             if re.search("\((19|20)[0-9]{2}\)", this_pub):
                 this_year = re.sub(r".*\(((19|20)[0-9]{2})\).*", r"\1", this_pub,1,re.DOTALL)
-                byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
+           #     byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
 
             elif re.search("(19|20)[0-9]{2}", this_pub):
                 this_year = re.sub(r".*(199[0-9]|20[0-2][0-9]).*", r"\1", this_pub,1,re.DOTALL)
                 if len(this_year) != 4:  print("ERROR", this_pub)
                 try:
-                    byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
+                    pass
+           #         byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
                 except:
                     print("year", this_year, " ERROR", this_pub)
 
             else:
-                print(    "no year", entry)
+                this_year = ""
+                print(    "no year", entry, "end_no_year")
+                print(    "this_pub", this_pub, "end_this_pub")
     #            print(    "everything",entry)
 
-        theanswer += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
+            if this_year in yearcount:
+              yearcount[this_year] += 1
+            else:
+              yearcount[this_year] = 1
+            formatted_entry = re.sub("yearplaceholder", this_year, formatted_entry)
+            formatted_entry = re.sub("counterplaceholder",  str(yearcount[this_year]), formatted_entry)
+            if this_year:
+                byyear[this_year] += utilities.tex_to_html_alphabets(formatted_entry) + "\n" 
+#        theanswer += utilities.tex_to_html_alphabets(formatted_entry) + "\n"
 
-    theanswer = thehead + theanswer
+#    theanswer = thehead + theanswer + "ASSDSDADSFDSAFDFDFSSDFFDSDF"
 #    theanswer += "</body> </html>"
-    theanswer += "</div>"
+#    theanswer += "</div>"
 
     answer_by_year = thehead
 
-    for n in range(2022, 1997, -1):
+    for n in range(2023, 1997, -1):
         answer_by_year += "<div class='newyear'>" + str(n) + "</div>"
         answer_by_year += byyear[str(n)]
 
@@ -2316,7 +2330,7 @@ def mytransform_html_ptx(text):
     thetext = re.sub("&hellip;", "<ellipsis/>", thetext)
     thetext = re.sub("&ldquo;", "<lq/>", thetext)
     thetext = re.sub("&rdquo;", "<rq/>", thetext)
-    thetext = re.sub("&radic;", "<m>\sqrt{}</m>", thetext)
+#    thetext = re.sub("&radic;", "<m>\sqrt{}</m>", thetext)
     thetext = re.sub("&#39;", "'", thetext)
     thetext = re.sub("&#123;", "<lbrace/>", thetext)
     thetext = re.sub("&#125;", "<rbrace/>", thetext)
