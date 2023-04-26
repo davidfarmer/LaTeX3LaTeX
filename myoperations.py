@@ -203,7 +203,7 @@ def mytransform_ldata(text):
     thetext = re.sub(r'HRmore', '', thetext)
     thetext = re.sub(r'HR', '', thetext)
 
-    if not thetext.startswith('itemtosave={"R') and not thetext.startswith('itemtosave={"ckappa'):
+    if not thetext.startswith('itemtosave={"'):
         print("starts with", thetext[:50])
         print("data file starts wrong, quitting")
         die()
@@ -316,7 +316,8 @@ def mytransform_ldata(text):
           thetext = re.sub("^\s*,*", "", thetext)
 
 ###          this_value = "{" + thesortofweight + "," + thedata + "}"
-          this_value = "{" + thesortofweight + "," + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
+  ###        this_value = "{" + thesortofweight + "," + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
+          this_value = "{" + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
 
           component.foundvalues.append(this_value)
 
