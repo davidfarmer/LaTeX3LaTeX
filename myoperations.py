@@ -203,7 +203,7 @@ def mytransform_ldata(text):
     thetext = re.sub(r'HRmore', '', thetext)
     thetext = re.sub(r'HR', '', thetext)
 
-    if not thetext.startswith('itemtosave={"R') and not thetext.startswith('itemtosave={"ckappa'):
+    if not thetext.startswith('itemtosave={"'):
         print("starts with", thetext[:50])
         print("data file starts wrong, quitting")
         die()
@@ -271,10 +271,12 @@ def mytransform_ldata(text):
 
         if refineddata:
    #     thesortofweight = re.search(r'^itemtosave *= *{"R[0,1]_C([0-9]+)",', thetext).group(1)
-          thesortofweight = re.search(r'^itemtosave *= *{"ckappa_rdelta_([0-9]+)",', thetext).group(1)
+###          thesortofweight = re.search(r'^itemtosave *= *{"ckappa_rdelta_([0-9]+)",', thetext).group(1)
+          thesortofweight = "unused"
           print("found thesortofweight", thesortofweight)
    #     thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)", *', "", thetext)
-          thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)[^"]+", *', "", thetext)
+###          thetext = re.sub('^itemtosave *= *{"R[0,1]_C([0-9]+)[^"]+", *', "", thetext)
+          thetext = re.sub('^itemtosave *= *{"[^,]+", *', "", thetext)
 
           # save version
           version = re.search('^([^,]+),', thetext).group(1)
@@ -293,13 +295,29 @@ def mytransform_ldata(text):
           searchparameters, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
 
+          searchparameters = searchparameters[1:-1]  # remove first and last characers, which are { and }
+          startingsearchparameters, othersearchparameters = utilities.first_bracketed_string(searchparameters)
+          startingsearchparameters = re.sub("^\s*,*", "", startingsearchparameters)
+          othersearchparameters = re.sub("^\s*,*", "", othersearchparameters)
+          print("startingsearchparameters", startingsearchparameters)
+          print("othersearchparameters 0", othersearchparameters)
+          othersearchparameters = othersearchparameters[1:-1]  # remove first and last characers, which are { and }
+          finalsearchparameters, othersearchparameters = utilities.first_bracketed_string(othersearchparameters)
+          othersearchparameters = re.sub("^\s*,*", "", othersearchparameters)
+          print("othersearchparameters 1", othersearchparameters)
+          othersearchparameters = re.sub('^[^,]*,', "", othersearchparameters)  # throw away the number of iterations
+          print("othersearchparameters 2", othersearchparameters)
+          finalprecision, othersearchparameters = utilities.first_bracketed_string(othersearchparameters)
+
           parameterchanges, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
 
           startingvalues, thetext = utilities.first_bracketed_string(thetext)
           thetext = re.sub("^\s*,*", "", thetext)
 
-          this_value = "{" + thesortofweight + "," + thedata + "}"
+###          this_value = "{" + thesortofweight + "," + thedata + "}"
+  ###        this_value = "{" + thesortofweight + "," + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
+          this_value = "{" + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
 
           component.foundvalues.append(this_value)
 
