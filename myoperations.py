@@ -610,7 +610,10 @@ def parseprob(text):
 
         remarkoriginator = ""
         if '<span class="by">' in remark:
-            remarkoriginator = re.findall('<span class="by-id">(.*?)</span>', remark)[0]
+            try:
+                remarkoriginator = re.findall('<span class="by-id">(.*?)</span>', remark)[0]
+            except:
+                pass  # need to do this better
         thisremark["originator"] = remarkoriginator
         remarks.append(thisremark)
 
@@ -1906,7 +1909,7 @@ def mytransform_reprints(text):
     theanswer = ""
     thehead = '<html> <head> <title>AIM Reprints </title> \n<link href="reprints.css" rel="stylesheet" type="text/css" />\n<script> MathJax = { tex: { inlineMath: [["$", "$"], ["\\\\(", "\\\\)"]] }, svg: { fontCache: "global" } }; </script> \n<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>\n<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script> </head>\n<body class="subpage"> <h1>AIM reprints</h1>'
 
-    thehead = "<!-- ./ltol.py AIM_Reprints_ALL_April_18_2023.txt path_to_outputfile. \n Then put as publishedpapers.txt in main WordPress directory --> \n " + "<style>.subpage > * { margin-left: auto; margin-right: auto; padding-left: 50px; padding-right: 60px; max-width: 600px; } .subpage { margin-bottom: 50px; } .newyear { margin-top: 2ex; margin-bottom: 0.5ex; font-size: 200%; } .onepaper { margin-bottom: 1.5ex; position: relative} .papertitle { text-decoration: none; font-size: 110%; } .papertitle:hover { background: #eee; } .pub { margin-left: 2em; font-style: italic; } .number { position: absolute; left: -0.6em; display: none; } .onepaper:hover .number { display: inline; } </style>"
+    thehead = "<!-- ./ltol.py reprints AIM_Reprints_ALL_April_18_2023.txt path_to_outputfile. \n Then put as publishedpapers.txt in main WordPress directory --> \n " + "<style>.subpage > * { margin-left: auto; margin-right: auto; padding-left: 50px; padding-right: 60px; max-width: 600px; } .subpage { margin-bottom: 50px; } .newyear { margin-top: 2ex; margin-bottom: 0.5ex; font-size: 200%; } .onepaper { margin-bottom: 1.5ex; position: relative} .papertitle { text-decoration: none; font-size: 110%; } .papertitle:hover { background: #eee; } .pub { margin-left: 2em; font-style: italic; } .number { position: absolute; left: -0.6em; display: none; } .onepaper:hover .number { display: inline; } </style>"
 
     thehead += "<dvi class='subpage'>"
 
