@@ -315,7 +315,13 @@ for inputfile, outputfile in component.iofilepairs:
     elif component.filetype_plus in ['iso']:
         component.onefile = myoperations.mytransform_iso(component.onefile)
 
-    if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
+    if component.filetype_plus in ["ptx_fix"]:
+        component.onefile = myoperations.ptx_fix(component.onefile)
+
+    print("done with ptx_fix");
+
+    if component.filetype_plus in ['ptx_pp', 'ptx_fix', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
+ #   if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
 
         component.onefile = myoperations.mytransform_ptx_remove_linefeeds(component.onefile)
 
@@ -389,13 +395,10 @@ for inputfile, outputfile in component.iofilepairs:
                                    "\n\n\n" + r"\2" + "\n" + r"\1" + r"\3", component.onefile)
         component.onefile = re.sub(r'type="labelalph"', 'label="(a)"', component.onefile)
 
-    if component.filetype_plus in ["ptx_fix"]:
-        component.onefile = myoperations.ptx_fix(component.onefile)
-
-    if "ptx" in component.filetype_plus:
-        # there is not actually a subtask tag
-        component.onefile = re.sub(r"<subtask\b", "<task", component.onefile)
-        component.onefile = re.sub(r"subtask>", "task>", component.onefile)
+#    if "ptx" in component.filetype_plus:
+#        # there is not actually a subtask tag
+#        component.onefile = re.sub(r"<subtask\b", "<task", component.onefile)
+#        component.onefile = re.sub(r"subtask>", "task>", component.onefile)
 
     if component.onefile and component.filetype_plus == 'html_matrix':
         this_matrix = component.onefile

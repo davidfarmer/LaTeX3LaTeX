@@ -2966,4 +2966,183 @@ def texmathtoptx(txt):
 
     return "<" + mathtag + ">" + thetext + "</" + mathtag + ">"
 
+#################3
+
+def ptx_fix(text):
+
+    thetext = text
+
+    thetext = re.sub(r"<p>\s*(<exercises)", r"\1", thetext)
+    thetext = re.sub(r"(</exercises>)\s*</p>", r"\1", thetext)
+
+    thetext = re.sub(r"(<exercise[^<>]*>)(.*?)(</exercise>)",
+                         postprocess_exer, thetext,0,re.DOTALL)
+
+    thetext = re.sub(r"(<figure[^<>]*>)(.*?)(</figure>)",
+                         postprocess_fig, thetext,0,re.DOTALL)
+
+    thetext = re.sub(r"(<example[^<>]*>)(.*?)(</example>)",
+                         postprocess_examp, thetext,0,re.DOTALL)
+
+    thetext = re.sub(r"\s*PARAGRAPH\s*", "\n</p>\n\n<p>\n", thetext)
+
+    return thetext
+
+#---------------
+
+def postprocess_examp(txt):
+
+    the_start_tag = txt.group(1)
+    the_content = txt.group(2)
+    the_end_tag = txt.group(3)
+
+#    print("in postprocess_exer the_content was", the_content)
+
+    thelabel = ""
+
+    if "\solution" in the_content:
+        try:
+            thesolution = re.match(r".*<p>\s*\\solution\{(.*?)\}\s*</p>", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"<p>\s*\\solution\{.*?\}\s*</p>","", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        except AttributeError:
+            the_content = utilities.replacemacro(the_content, "solution", 1, "STARTSOL#1ENDSOL")
+            thesolution = re.match(r".*STARTSOL(.*?)ENDSOL", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"STARTSOL(.*?)ENDSOL", "", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        if thesolution:
+            the_content += thesolution + "\n"
+ 
+    return the_start_tag + the_content + the_end_tag
+#---------------
+
+def postprocess_fig(txt):
+
+    the_start_tag = txt.group(1)
+    the_content = txt.group(2)
+    the_end_tag = txt.group(3)
+
+#    print("in postprocess_exer the_content was", the_content)
+
+    thelabel = ""
+
+    if "\\LABEL" in the_content:
+      try:
+        thelabel = re.match(r".*\\LABEL\{(.*?)\}", the_content, re.DOTALL).group(1)
+        the_content = re.sub(r"\s*\\LABEL\{.*?\}\s*", "", the_content, 1, re.DOTALL)
+
+        thelabel = re.sub(r":", "_", thelabel)
+      except AttributeError:
+        print("     YYYYY bad LABEL", the_content)
+
+    if thelabel:
+        the_start_tag = re.sub(">", ' xml:id="' + thelabel + '">', the_start_tag)
+ 
+    return the_start_tag + the_content + the_end_tag
+
+#---------------
+
+def postprocess_exer(txt):
+        
+    the_start_tag = txt.group(1)
+    the_content = txt.group(2)
+    the_end_tag = txt.group(3)
+    
+#    print("in postprocess_exer the_content was", the_content)
+
+    if "<task>" in the_content and "<statement>" in the_content:
+#        print("------------- the_content was", the_content)
+
+  #      the_content = re.sub("^(\s*)<statement>", r"\1<introduction>", the_content)
+        the_content = re.sub("^(.*?)<statement>", r"\1<introduction>",the_content, 1, re.DOTALL)
+        the_content = re.sub("</statement>\s*$", "", the_content)
+        the_content = re.sub("<task>", "</introduction>\n<task>", the_content, 1)
+    
+#        print("     ------------- the_content is", the_content)
+
+#        the_content = re.sub(r"(<task[^<>]*>)(.*?)(</task>)",
+#                         postprocess_tsk, the_content,0,re.DOTALL)
+
+    else:
+      if "\hint" in the_content:
+        try:
+            print("the_content",the_content)
+            thehint = re.match(r".*<p>\s*\\hint\{(.*?)\}\s*</p>", the_content, re.DOTALL).group(1)
+#            print("thehint",thehint)
+#            print("the_content",the_content)
+            the_content = re.sub(r"(<p>\s*\\hint\{.*?\}\s*</p>)","", the_content,1,re.DOTALL)
+            thehint = "<hint><p>\n" + thehint + "\n</p></hint>\n"
+        except AttributeError:
+            the_content = utilities.replacemacro(the_content, "hint", 1, "STARTHIN#1ENDHIN")
+            thehint = re.match(r".*STARTHIN(.*?)ENDHIN", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"STARTHIN(.*?)ENDHIN", "", the_content,1,re.DOTALL)
+            thehint = "<hint><p>\n" + thehint + "\n</p></hint>\n"
+        if thehint:
+            the_content += thehint + "\n"
+
+      if "\solution" in the_content:
+        try:
+            thesolution = re.match(r".*<p>\s*\\solution\{(.*?)\}\s*</p>", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"<p>\s*\\solution\{.*?\}\s*</p>","", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        except AttributeError:
+            the_content = utilities.replacemacro(the_content, "solution", 1, "STARTSOL#1ENDSOL")
+            thesolution = re.match(r".*STARTSOL(.*?)ENDSOL", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"STARTSOL(.*?)ENDSOL", "", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        if thesolution:
+            the_content += thesolution + "\n"
+
+    the_content = re.sub(r"(<task[^<>]*>)(.*?)(</task>)",
+                         postprocess_tsk, the_content,0,re.DOTALL)
+
+    return the_start_tag + the_content + the_end_tag
+
+#---------------
+
+def postprocess_tsk(txt):
+
+    the_start_tag = txt.group(1)
+    the_content = txt.group(2)
+    the_end_tag = txt.group(3)
+
+#  assumes at most one hint and/or one solution per task
+
+    if "\hint" in the_content or "\\solution" in the_content:
+        the_content = "<statement>\n" + the_content + "\n</statement>"
+
+    if "\hint" in the_content:
+        try:
+            print("the_content",the_content)
+            thehint = re.match(r".*<p>\s*\\hint\{(.*?)\}\s*</p>", the_content, re.DOTALL).group(1)
+#            print("thehint",thehint)
+#            print("the_content",the_content)
+            the_content = re.sub(r"(<p>\s*\\hint\{.*?\}\s*</p>)","", the_content,1,re.DOTALL)
+            thehint = "<hint>\n<p>" + thehint + "</p>\n</hint>\n"
+        except AttributeError:
+            the_content = utilities.replacemacro(the_content, "hint", 1, "STARTHIN#1ENDHIN")
+            thehint = re.match(r".*STARTHIN(.*?)ENDHIN", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"STARTHIN(.*?)ENDHIN", "", the_content,1,re.DOTALL)
+            thehint = "<hint><p>\n" + thehint + "\n</p></hint>\n"
+        if thehint:
+            the_content += thehint + "\n"
+
+    if "\\solution" in the_content:
+        try:
+            thesolution = re.match(r".*<p>\s*\\solution\{(.*?)\}\s*</p>", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"<p>\s*\\solution\{.*?\}\s*</p>","", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        except AttributeError:
+            the_content = utilities.replacemacro(the_content, "solution", 1, "STARTSOL #1 ENDSOL")
+            thesolution = re.match(r".*STARTSOL(.*?)ENDSOL", the_content, re.DOTALL).group(1)
+            the_content = re.sub(r"STARTSOL(.*?)ENDSOL", "", the_content,1,re.DOTALL)
+            thesolution = "<solution><p>\n" + thesolution + "\n</p></solution>\n"
+        if thesolution:
+            the_content += thesolution + "\n"
+
+    if "\\solution" in the_content:
+        print("      XXXXXXXXXX tow solutions", the_content)
+
+
+    return the_start_tag + the_content + the_end_tag
 
