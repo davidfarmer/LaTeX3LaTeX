@@ -248,7 +248,7 @@ def mytransform_ldata(text):
       #    return ""
 
       else:
-          this_value = "{" + lamset + "," + coefficients_set + "," + eig_precision + "," + coeff_precision + "," + search_params + "}"
+          this_value = "{" + lamset + "," + coefficients_set + "," + eig_precision + ", {" + coeff_precision + "," + search_params + "}}"
 
           component.foundvalues.append(this_value)
 
@@ -317,7 +317,9 @@ def mytransform_ldata(text):
 
 ###          this_value = "{" + thesortofweight + "," + thedata + "}"
   ###        this_value = "{" + thesortofweight + "," + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
-          this_value = "{" + thedata + "," + finalsearchparameters + "," + finalprecision + "}"
+
+  # as of 9/7/23, this is the where the output is assembled
+          this_value = "{" + thedata + ", {" + finalsearchparameters + "," + finalprecision + "}}"
 
           component.foundvalues.append(this_value)
 
@@ -371,7 +373,7 @@ def mytransform_ldata(text):
       #      return ""
 
           else:
-              this_value = "{" + lamset + "," + coefficients_set + "," + eig_precision + "," + coeff_precision + "," + search_params + "}"
+              this_value = "{" + lamset + "," + coefficients_set + ", {" + eig_precision + "," + coeff_precision + "," + search_params + "}}"
 
               component.foundvalues.append(this_value)
 
