@@ -2497,12 +2497,19 @@ def mytransform_tex(text):
 #    thetext = re.sub(r"\\end{ex}", r"\\end{example}", thetext)
 #    thetext = re.sub(r"\\begin{framed}", r"\\begin{aside}", thetext)
 #    thetext = re.sub(r"\\end{framed}", r"\\end{aside}", thetext)
-    thetext = re.sub(r".*\\input table", "", thetext, 0, re.DOTALL)
-    thetext = re.sub(r"\\end{document}.*", "", thetext, 0, re.DOTALL)
 
-    thetext = "\n\n" + r"\begin{solution}" + "\n" + thetext.strip() + "\n" + r"\end{solution}" + "\n\n"
+#    thetext = re.sub(r".*\\input table", "", thetext, 0, re.DOTALL)
+#    thetext = re.sub(r"\\end{document}.*", "", thetext, 0, re.DOTALL)
+#
+#    thetext = "\n\n" + r"\begin{solution}" + "\n" + thetext.strip() + "\n" + r"\end{solution}" + "\n\n"
+#
+#    thetext = re.sub("\r\n", "\n", thetext, 0, re.DOTALL)
 
-    thetext = re.sub("\r\n", "\n", thetext, 0, re.DOTALL)
+    thetext = re.sub(r"(\S)\\label", r"\1 \\label",thetext,0,re.DOTALL)
+
+    thetext = re.sub(r"\\emph{ *Hint:}\s*(.*?\.)",r"\\hint{\1}",thetext,0,re.DOTALL)
+    thetext = re.sub(r"\\emph{ *Hint}:\s*(.*?\.)",r"\\hint{\1}",thetext,0,re.DOTALL)
+    thetext = re.sub(r"\bHint\s*:*\s*([^\.]+\.)",r"\\hint{\1}",thetext,0,re.DOTALL)
 
 #    thetext = re.sub(r"\s*\\\\\s*~\\\\\s*", "\n\n", thetext, 0, re.DOTALL)
 #    thetext = re.sub(r"\\\\\n\n", "\n\n", thetext, 0, re.DOTALL)

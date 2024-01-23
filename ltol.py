@@ -111,6 +111,9 @@ elif component.filetype_plus in ["probhtml"]:
 elif component.filetype_plus in ["raw"]:
     fileextension_in = "raw"
     fileextension_out = "txt"
+elif component.filetype_plus in ["tex"]:
+    fileextension_in = "tex"
+    fileextension_out = "tex"
 elif component.filetype_plus in ["lmfdb"]:
     fileextension_in = "txt"
     fileextension_out = "txt"
