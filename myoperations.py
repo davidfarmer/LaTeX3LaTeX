@@ -1260,6 +1260,60 @@ def old_mytransform_ptx(text):
 
 ###################
 
+###################
+
+def mytransform_survey(text):
+
+    thetext = text
+
+    thecsvversion = ""
+
+    thetext = re.sub(r".*Responses by person\)</h2>", "", thetext, 1, re.DOTALL)
+    thetext = re.sub(r'<div class="span2">.*?</div>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub(r'\n{2,}', "\n", thetext, 0, re.DOTALL)
+    thetext = re.sub(r'</div>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub(r'<hr/>', "", thetext, 0, re.DOTALL)
+    thetext = re.sub(r'(<p>|</p>)', "", thetext, 0, re.DOTALL)
+    thetext = re.sub(r'<div class="row">', "", thetext, 0, re.DOTALL)
+
+    thepeople = thetext.split('<div class="span8">')
+
+    ct = 0
+    for person in thepeople:
+
+        person = person.strip()
+
+        ct += 1
+
+        print(str(ct) + "-----------")
+        print(person)
+        print("-----------")
+        thesequestions = {}
+        fullresponses = person.split("<h3>")
+
+        for response in fullresponses:
+
+            thisquestion = re.sub("(.*?)</h3>.*", r"\1", response, 1, re.DOTALL)
+            thisanswer = re.sub(".*?</h3>(.*)", r"\1", response, 1, re.DOTALL)
+            thisanswer = thisanswer.strip()
+            if thisanswer:
+                thesequestions[thisquestion] = thisanswer
+            else:
+                thesequestions[thisquestion] = "BLANK"
+
+
+        for question in thesequestions:
+            thecsvversion += thesequestions[question] + "\t"
+
+        thecsvversion += "\n"
+        thecsvversion += "-------------------"
+        thecsvversion += "\n"
+
+    return thecsvversion
+
+
+###################
+
 def mytransform_fixptx(text):
 
     tags = [["pretext"], ["book"], ["chapter", "titlepage", "frontmatter", "backmatter", "docinfo"],

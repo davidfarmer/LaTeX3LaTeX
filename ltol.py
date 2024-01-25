@@ -29,6 +29,7 @@ conversion_options = ["xml", "ptx_pp", "xml_pp", "ptx_fix", "ptx_transform",
                       "iso",
                       "ptx",
                       "fixptx",
+                      "survey",
                       "ldata",
                       "reprints",
                       "html_ptx",
@@ -114,6 +115,9 @@ elif component.filetype_plus in ["raw"]:
 elif component.filetype_plus in ["tex"]:
     fileextension_in = "tex"
     fileextension_out = "tex"
+elif component.filetype_plus in ["survey"]:
+    fileextension_in = "html"
+    fileextension_out = "csv"
 elif component.filetype_plus in ["lmfdb"]:
     fileextension_in = "txt"
     fileextension_out = "txt"
@@ -285,6 +289,8 @@ for inputfile, outputfile in component.iofilepairs:
         component.onefile = myoperations.mytransform_aimplstructure(component.onefile)
     if component.filetype_plus == 'fixptx':
         component.onefile = myoperations.mytransform_fixptx(component.onefile)
+    if component.filetype_plus == 'survey':
+        component.onefile = myoperations.mytransform_survey(component.onefile)
     if component.filetype_plus == 'html_matrix':
         component.onefile = myoperations.mytransform_html_matrix(component.onefile)
     if component.filetype_plus in ['xml_semantic', 'ptx_semantic', 'html_semantic']:
@@ -453,7 +459,7 @@ if component.generic_counter:
 if component.extra_macros:
     print("component.extra_macros", component.extra_macros)
 
-print("need to start again at",  component.startagain)
+# print("need to start again at",  component.startagain)
 
 #print "all found values"
 #for j in range(20):
