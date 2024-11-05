@@ -330,7 +330,7 @@ for inputfile, outputfile in component.iofilepairs:
     if component.filetype_plus in ["ptx_fix"]:
         component.onefile = myoperations.ptx_fix(component.onefile)
 
-    print("done with ptx_fix");
+#    print("done with ptx_fix");
 
     if component.filetype_plus in ['ptx_pp', 'ptx_fix', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
  #   if component.filetype_plus in ['ptx_pp', 'xml_pp', 'tex_ptx', 'html_ptx', 'aimplstructure']:
@@ -430,8 +430,8 @@ for inputfile, outputfile in component.iofilepairs:
         if component.filetype_plus == "probhtml":
             outputfile = re.sub("/([^/]+)$", "/" + component.aimplid + r"-\1", outputfile)
 
-        print("component.aimplid", component.aimplid)
-        print("outputfile", outputfile)
+#        print("component.aimplid", component.aimplid)
+#        print("outputfile", outputfile)
 
         with open(outputfile, 'w') as outfile:
             outfile.write(component.onefile)

@@ -750,7 +750,7 @@ def mytransform_ptx_remove_linefeeds(text):
         component.lipcounter[lip_tag] = 0
         thetext = utilities.tag_to_numbered_tag(lip_tag, thetext)
 
-        print("counted", component.lipcounter[lip_tag], "of", lip_tag)
+   #     print("counted", component.lipcounter[lip_tag], "of", lip_tag)
 
     for lip_tag in ["p", "li"]:
         for n in range(component.lipcounter[lip_tag]):
@@ -786,7 +786,7 @@ def mytransform_ptx_linefeeds(text):
         component.lipcounter[lip_tag] = 0
         thetext = utilities.tag_to_numbered_tag(lip_tag, thetext)
 
-        print("counted", component.lipcounter[lip_tag], "of", lip_tag)
+   #     print("counted", component.lipcounter[lip_tag], "of", lip_tag)
 
     for lip_tag in ["p", "li"]:
         for n in range(component.lipcounter[lip_tag]):
