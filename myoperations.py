@@ -1975,7 +1975,7 @@ def mytransform_reprints(text):
 
     thetitles = []
 
-    byyear = {str(n) : "" for n in range(1998,2025) }
+    byyear = {str(n) : "" for n in range(1998,2026) }
 
     thetext = re.sub("\n{2,}", "\n\n", thetext)
     thetext = re.sub("\?\?\?", "-", thetext)
@@ -2078,7 +2078,7 @@ def mytransform_reprints(text):
 
     answer_by_year = thehead
 
-    for n in range(2023, 1997, -1):
+    for n in range(2024, 1997, -1):
         answer_by_year += "<div class='newyear'>" + str(n) + "</div>"
         answer_by_year += byyear[str(n)]
 
@@ -2114,6 +2114,76 @@ def mytransform_raw(text):
 ###################
 
 def mytransform_txt(text):
+
+    thetext = text
+
+    theanswer = ""
+
+    thetext = re.sub(r"\s*files\s*Resources\s*old\s*printable\s*list\s*", "",thetext)
+    thetext = re.sub(r"\s*Applicants.*", "",thetext)
+    thetext = re.sub(r"\s*Invited.*", "",thetext)
+
+    thetext = re.sub("\t", " ",thetext)
+    thetext = re.sub(" {2,}", " ",thetext)
+
+    thetext = re.sub("^\s*", "",thetext)
+    thesquares = thetext.split("Misc")
+
+    print("number of SQuaREs:", len(thesquares))
+
+    print(thesquares[7])
+
+    for square in thesquares:
+      if square:
+        these_lines = square.splitlines()
+        thetitle = these_lines[0]
+        thetitle = thetitle.strip()
+        thetitle = re.sub("^[0-9]+ *", "", thetitle)
+        thetitle = re.sub("\(.*","", thetitle)
+        thetitle = thetitle.strip()
+
+        theanswer += "\\item " + thetitle + ",\n"
+
+        theorganizer = these_lines[4]
+        theorganizer = re.sub(".*:", "", theorganizer)
+        theorganizer = re.sub(" [^ ]+$", "", theorganizer)
+        theorganizer = theorganizer.strip()
+
+        if these_lines[5].strip():
+            nextorganizer = these_lines[5].strip()
+            nextorganizer = re.sub(" [^ ]+$", "", nextorganizer)
+            nextorganizer = nextorganizer.strip()
+            theorganizer += ", " + nextorganizer
+
+            if len(these_lines) > 7 and these_lines[6].strip():
+                nextorganizer = these_lines[6].strip()
+                nextorganizer = re.sub(" [^ ]+$", "", nextorganizer)
+                nextorganizer = nextorganizer.strip()
+                theorganizer += ", " + nextorganizer
+            if len(these_lines) > 8 and these_lines[7].strip():
+                nextorganizer = these_lines[7].strip()
+                nextorganizer = re.sub(" [^ ]+$", "", nextorganizer)
+                nextorganizer = nextorganizer.strip()
+                theorganizer += ", " + nextorganizer
+            if len(these_lines) > 9 and these_lines[8].strip():
+                nextorganizer = these_lines[8].strip()
+                nextorganizer = re.sub(" [^ ]+$", "", nextorganizer)
+                nextorganizer = nextorganizer.strip()
+                theorganizer += ", " + nextorganizer
+
+
+        if len(these_lines) > 8:
+            theorganizer = re.sub(", ([^,]+)$", r", and \1", theorganizer)
+        else:
+            theorganizer = re.sub(", ([^,]+)$", r" and \1", theorganizer)
+
+        theanswer += "\\emph{" + theorganizer + "}\n\n"
+
+    return theanswer
+
+###################
+
+def mytransform_txtBIBLIO(text):
 
     thetext = text
 

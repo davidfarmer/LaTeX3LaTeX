@@ -83,7 +83,7 @@ if len(sys.argv) == 5 and sys.argv[4] == 'R':
 print(component.inputname)
 print(component.outputname)
 
-print("component.current_permid", component.current_permid)
+# print("component.current_permid", component.current_permid)
 junk=[]
 
 if component.filetype_plus not in conversion_options:
@@ -111,6 +111,9 @@ elif component.filetype_plus in ["probhtml"]:
     fileextension_out = "ptx"
 elif component.filetype_plus in ["raw"]:
     fileextension_in = "raw"
+    fileextension_out = "txt"
+elif component.filetype_plus in ["txt"]:
+    fileextension_in = "txt"
     fileextension_out = "txt"
 elif component.filetype_plus in ["tex"]:
     fileextension_in = "tex"
